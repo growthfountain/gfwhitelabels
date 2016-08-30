@@ -17,7 +17,6 @@ module.exports = {
         contentBase: './dist/',
     },
 
-
     uglifyJsPlugin: new webpack.optimize.UglifyJsPlugin({
         compressor: {
             screw_ie8: true,
