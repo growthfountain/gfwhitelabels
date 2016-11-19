@@ -5,7 +5,44 @@ module.exports = Backbone.Router.extend({
   routes: {
     'api/campaign': 'list',
     'api/campaign/:id': 'detail',
+    'api/campaign/:id/pdf': 'pdf',
     'api/campaign/:id/invest': 'investment',
+  },
+
+  pdf() {
+    // add scripts
+
+    let p = document.createElement("script");
+    p.type = "text/javascript";
+    p.src = "/js/pdfmake.js";
+    $("head").append(p);
+    debugger;
+
+    let s = document.createElement("script");
+    s.type = "text/javascript";
+    s.src = "/js/vfs_fonts.js";
+    $("head").append(s);
+
+    debugger;
+
+    var docDefinition = { 
+      Roboto: {
+        normal: '/fonts/Roboto-Regular.ttf',
+        bold: '/fonts/Roboto-Medium.ttf',
+        italics: '/fonts/Roboto-Italic.ttf',
+        bolditalics: '/fonts/Roboto-Italic.ttf'
+      },
+      content: 'This is an sample PDF printed with pdfMake' 
+    };
+
+    // open the PDF in a new window
+    pdfMake.createPdf(docDefinition).open();
+
+    // print the PDF (temporarily Chrome-only)
+    pdfMake.createPdf(docDefinition).print();
+
+    // download the PDF (temporarily Chrome-only)
+    pdfMake.createPdf(docDefinition).download('optionalName.pdf');
   },
 
   list() {
