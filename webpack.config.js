@@ -3,14 +3,16 @@ var webpack = require('webpack'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
     autoprefixer = require('autoprefixer'),
     path = require('path');
+var ChunkManifestPlugin = require("chunk-manifest-webpack-plugin");
+var WebpackChunkHash = require("webpack-chunk-hash");
 
 module.exports = {
-    entry: './src/app.js',
-    devtool: 'eval-source',
+    entry: ['./src/app.js'],
+    devtool: ['eval-source'],
     output: {
         path: __dirname + '/dist',
         publicPath: '/',
-        filename: 'bundle.js'
+        filename: 'bundle.[hash].js',
     },
 
     devServer: {
@@ -26,14 +28,13 @@ module.exports = {
 
     resolve: {
         extensions: ['', '.js', '.pug', '.sass', '.scss'],
-        modulesDirectories: [
-            './src',
+        modules: [
+            path.join(__dirname, "./src"),
             './',
             './node_modules',
         ]
     },
 
-    debug: true,
 
     plugins: [
         new ExtractTextPlugin("style.css"),
@@ -50,7 +51,13 @@ module.exports = {
             "window.Tether": "tether",
             Backbone: "backbone"
         }),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.LoaderOptionsPlugin({
+            minimize: true
+        }),
+        new webpack.LoaderOptionsPlugin({
+            debug: true
+        }),
     ],
 
     module: {
