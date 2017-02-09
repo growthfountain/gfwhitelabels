@@ -5,10 +5,11 @@ var webpack = require('webpack'),
     path = require('path');
 var ChunkManifestPlugin = require("chunk-manifest-webpack-plugin");
 var WebpackChunkHash = require("webpack-chunk-hash");
+var CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
     entry: './src/app.js',
-    devtool: ['eval-source'],
+    devtool: 'eval-source',
     output: {
         path: __dirname + '/dist',
         publicPath: '/',
@@ -42,7 +43,8 @@ module.exports = {
             title: 'Backbone App',
             template: './src/index.html',
             filename: 'index.html',
-            inject: 'body' // Inject all scripts into the body
+            inject: 'body', // Inject all scripts into the body
+            cache: true
         }),
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -57,6 +59,16 @@ module.exports = {
         }),
         new webpack.LoaderOptionsPlugin({
             debug: true
+        }),
+        
+        new webpack.optimize.UglifyJsPlugin(),
+        //GZIP 
+        new CompressionPlugin({
+            asset: "[path].gz[query]",
+            algorithm: "gzip",
+            test: /\.js$|\.html$/,
+            threshold: 10240,
+            minRatio: 0.8
         }),
     ],
 
