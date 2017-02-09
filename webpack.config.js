@@ -7,7 +7,7 @@ var ChunkManifestPlugin = require("chunk-manifest-webpack-plugin");
 var WebpackChunkHash = require("webpack-chunk-hash");
 
 module.exports = {
-    entry: ['./src/app.js'],
+    entry: './src/app.js',
     devtool: ['eval-source'],
     output: {
         path: __dirname + '/dist',
