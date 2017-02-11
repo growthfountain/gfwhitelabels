@@ -12,7 +12,6 @@ var gulp        = require('gulp'),
 
 var config = {
     bootstrapDir: './node_modules/bootstrap/scss',
-    bourbonDir: './node_modules/bourbon/app/assets/stylesheets',
     tatherDir: './node_modules/tether',
     fontAwesomeDir: './node_modules/font-awesome/scss',
     owlCarousel: './node_modules/owl.carousel/src/scss',
@@ -39,7 +38,6 @@ gulp.task('styles', function () {
     .pipe(sass({
         includePaths: [
             config.bootstrapDir,
-            require('node-bourbon').includePaths,
             config.tetherDir,
             config.owlCarousel,
             config.fontAwesomeDir

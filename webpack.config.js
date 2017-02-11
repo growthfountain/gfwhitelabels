@@ -1,96 +1,124 @@
-var webpack = require('webpack'),
-    ExtractTextPlugin = require('extract-text-webpack-plugin'),
+const path = require('path'),
+    fs = require('fs'),
+    
+    webpack = require('webpack'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
-    autoprefixer = require('autoprefixer'),
-    path = require('path');
-var ChunkManifestPlugin = require("chunk-manifest-webpack-plugin");
-var WebpackChunkHash = require("webpack-chunk-hash");
-var CompressionPlugin = require("compression-webpack-plugin");
+    UglifyJsPlugin = require('webpack-uglify-js-plugin'),
+    CleanPlugin = require('clean-webpack-plugin'),
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    
+    entryFile = path.join(__dirname, './src/app.js'),
+    devServerPort = 8080
 
-module.exports = {
-    entry: './src/app.js',
-    devtool: 'eval-source',
-    output: {
-        path: __dirname + '/dist',
-        publicPath: '/',
-        filename: 'bundle.[hash].js',
-    },
-
-    devServer: {
-        contentBase: './dist/',
-        historyApiFallback: true,
-        inline: true,
-        hot: true,
-        port: 7070,
-        stats: {
-            colors: true
-        }
-    },
-
-    resolve: {
-        extensions: ['', '.js', '.pug', '.sass', '.scss'],
-        modules: [
-            path.join(__dirname, "./src"),
-            './',
-            './node_modules',
-        ]
-    },
-
-
-    plugins: [
-        new ExtractTextPlugin("style.css"),
-        new HtmlWebpackPlugin({
-            title: 'Backbone App',
-            template: './src/index.html',
-            filename: 'index.html',
-            inject: 'body', // Inject all scripts into the body
-            cache: true
-        }),
-        new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-            Tether: "tether",
-            "window.Tether": "tether",
-            Backbone: "backbone"
-        }),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.LoaderOptionsPlugin({
-            minimize: true
-        }),
-        new webpack.LoaderOptionsPlugin({
-            debug: true
-        }),
+let config = function (env) {
+    let returner = {
+        entry: entryFile,
         
-        new webpack.optimize.UglifyJsPlugin(),
-        //GZIP 
-        new CompressionPlugin({
-            asset: "[path].gz[query]",
-            algorithm: "gzip",
-            test: /\.js$|\.html$/,
-            threshold: 10240,
-            minRatio: 0.8
-        }),
-    ],
-
-    module: {
-        loaders: [
-            {test: /bootstrap\/js\//, loader: 'imports?jQuery=$' },
-            {test: /\.html?$/, loader: 'file?name=[name].[ext]'},
-            {test: /\.pug$/, loader: 'pug-loader'},
-            {test: /\.json$/, exclude: /node_modules/, loader: 'json-loader'},
-            {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader', query: {presets: ['es2015']}},
-            {test: /\.css$/, loaders: ['style-loader', 'css-loader']},
-            {test: /\.sass$/, loaders: ['style-loader', 'css-loader', 'sass-loader']},
-            {test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader']},
-            {test: /\.png$/, loader: 'url?limit=8192&mimetype=image/png'},
-            {test: /\.jpe?g$/, loader: 'url?limit=8192&mimetype=image/jpg'},
-            {test: /\.gif$/, loader: 'url?limit=8192&mimetype=image/gif'},
-            {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=8192&mimetype=image/svg+xml'},
-            {test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=8192&mimetype=application/font-woff2'},
-            {test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=8192&mimetype=application/font-woff'},
-            {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=8192&mimetype=application/octet-stream'},
-            {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=8192&mimetype=application/octet-stream'},
-            {test: /\.md$/, loaders: ['html', 'markdown']}
+        resolve: {
+            extensions: ['.js', '.pug', '.sass', '.scss'],
+            modules: [path.join(__dirname, './src'), 'node_modules'],
+            alias: {
+                'src': path.resolve(__dirname, 'src/'),
+                'pages': path.resolve(__dirname, 'src/templates/'),
+                'components': path.resolve(__dirname, 'src/components/')
+            }
+        },
+        
+        output: {
+            pathinfo: true,
+            devtoolLineToLine: true,
+            filename: '[hash].[name].js',
+            sourceMapFilename: "[hash].[name].js.map",
+            path: path.join(__dirname, '/dist')
+        },
+        
+        module: {
+            rules: [
+                {test: /\.pug$/, loader: 'pug-loader'},
+                {test: /\.js?$/, loader: 'source-map-loader', enforce: 'pre'},
+                {test: /\.(png|jpe?g|gif)$/, loader: 'file-loader', options: {name: '[name].[ext]?[hash]'}},
+                {test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/, loader: 'file-loader', options: {name: '[name].[ext]?[hash]'}},
+                {test: /\.svg$/, loader: 'url-loader'},
+                {test: /\.s[ca]ss$/, loader: ['style-loader', 'css-loader', 'sass-loader']},
+            ]
+        },
+        
+        plugins: [
+            new webpack.DefinePlugin({
+                'process.env': {
+                    'NODE_ENV': JSON.stringify((env && typeof env != "undefined" && env.release) ? 'production' : 'development')
+                }
+            }),
+            new HtmlWebpackPlugin({
+                filename: 'index.html',
+                template: 'src/index.html',
+                inject: true,
+                minify: {
+                    removeComments: true,
+                    removeScriptTypeAttributes: true,
+                    removeAttributeQuotes: true,
+                    useShortDoctype: true,
+                    decodeEntities: true,
+                    collapseWhitespace: true,
+                    minifyCSS: true
+                }
+            })
         ]
     }
-};
+    
+    if (typeof env == "undefined" || typeof env.devserver == "undefined") {
+        returner.plugins.push(new ExtractTextPlugin("styles.css"))
+        returner.module.rules.push({
+            test: /\.css$/, use: ExtractTextPlugin.extract({
+                fallbackLoader: "style-loader",
+                loader: "css-loader"
+            })
+        })
+    }
+    
+    if (env) {
+        if (typeof env.devserver != 'undefined' && env.devserver) {
+            returner.module.rules.push({
+                test: /\.css$/, loader: ['style-loader', 'css-loader']
+            })
+            returner.output.publicPath = "/"
+            returner.devtool = "eval"
+            returner.devServer = {
+                contentBase: path.join(__dirname, "/dist"),
+                port: devServerPort,
+                stats: {colors: true},
+                watchOptions: {
+                    aggregateTimeout: 300,
+                    poll: 1000
+                },
+                headers: {
+                    "Access-Control-Allow-Origin": "*"
+                },
+                host: "0.0.0.0"
+            }
+            returner.plugins.push(new webpack.NamedModulesPlugin())
+        } else if (typeof env.release != 'undefined' && env.release) {
+            returner.plugins.push(new CleanPlugin("www", {
+                root: path.join(__dirname, "."),
+                dry: false,
+                exclude: ["index.html"]
+            }))
+            returner.plugins.push(new UglifyJsPlugin({
+                    cacheFolder: path.resolve(__dirname, 'webpack/cached_uglify/'),
+                    debug: true,
+                    minimize: true,
+                    output: {
+                        comments: false
+                    },
+                    compressor: {
+                        warnings: false
+                    }
+                }
+            ))
+        }
+    }
+    
+    return returner
+}
+
+module.exports = config
