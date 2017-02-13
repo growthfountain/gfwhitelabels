@@ -16,10 +16,9 @@ let config = function (env) {
         
         resolve: {
             extensions: ['.js', '.pug', '.sass', '.scss'],
-            modules: [path.join(__dirname, './src'), 'node_modules'],
+            modules: [path.join(__dirname, ''), path.join(__dirname, './src'), 'node_modules'],
             alias: {
                 'src': path.resolve(__dirname, 'src/'),
-                'pages': path.resolve(__dirname, 'src/templates/'),
                 'components': path.resolve(__dirname, 'src/components/')
             }
         },
