@@ -2,7 +2,6 @@ global.cookies = require('cookies-js');
 global.config = require('config');
 global.$ = global.jQuery = require('jquery');
 global._ = require('underscore');
-global.Backbone = require('backbone');
 window.Tether = require('tether');
 global.Bootstrap = require('bootstrap/dist/js/bootstrap.js');
 global.OwlCarousel = require('owl.carousel/dist/owl.carousel.min.js');
