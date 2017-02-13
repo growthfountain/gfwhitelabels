@@ -2,7 +2,7 @@ const isBoolean = function(val) {
   return val == 0 || val == 1 || val == true || val == false;
 }
 
-let exports = {
+let exp = {
   calcProgress: function(data) {
     try {
       return {
@@ -124,4 +124,4 @@ let exports = {
   }
 };
 
-module.exports = exports;
+module.exports = exp;

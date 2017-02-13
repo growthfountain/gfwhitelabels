@@ -1,6 +1,6 @@
 const moment = require('moment');
 
-let exports = {
+let exp = {
   formcLinks: {
     51: 'https://www.sec.gov/cgi-bin/browse-edgar?CIK=0001693725&action=getcompany',
     52: 'https://www.sec.gov/Archives/edgar/data/1693726/000166850617000003/0001668506-17-000003-index.htm',
@@ -32,4 +32,4 @@ let exports = {
   },
 };
 
-module.exports = exports;
+module.exports = exp;

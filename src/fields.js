@@ -5,7 +5,7 @@ const helpers = {
   icons: require('./helpers/iconsHelper.js'),
 };
 
-let exports = {
+let exp = {
   prepareNestedField(nestedName, name, value, index, myAttr, schema) {
     if(value == null) {
       console.log('value for ' + name + ' is null ')
@@ -398,4 +398,4 @@ let exports = {
 
 };
 
-module.exports = exports;
+module.exports = exp;
