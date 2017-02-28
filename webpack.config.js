@@ -28,13 +28,14 @@ let config = function (env) {
             devtoolLineToLine: true,
             filename: '[hash].[name].js',
             sourceMapFilename: "[hash].[name].js.map",
-            path: path.join(__dirname, '/dist')
+            path: path.join(__dirname, 'dist')
         },
         
         module: {
             rules: [
                 {test: /\.pug$/, loader: 'pug-loader'},
-                {test: /\.js?$/, loader: 'source-map-loader', enforce: 'pre'},
+                //{test: /\.js$/, loader: 'source-map-loader', enforce: 'pre'},
+                {test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader', query: {presets: ['es2015']}},
                 {test: /\.(png|jpe?g|gif)$/, loader: 'file-loader', options: {name: '[name].[ext]?[hash]'}},
                 {test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/, loader: 'file-loader', options: {name: '[name].[ext]?[hash]'}},
                 {test: /\.svg$/, loader: 'url-loader'},
@@ -61,7 +62,20 @@ let config = function (env) {
                     collapseWhitespace: true,
                     minifyCSS: true
                 }
-            })
+            }),
+            new HtmlWebpackPlugin({
+                title: 'Backbone App',
+                template: './src/index.html',
+                filename: 'index.html',
+                inject: 'body' // Inject all scripts into the body
+        }),
+            new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            Tether: "tether",
+            "window.Tether": "tether",
+            Backbone: "backbone"
+        })
         ]
     }
     
@@ -80,10 +94,10 @@ let config = function (env) {
             returner.module.rules.push({
                 test: /\.css$/, loader: ['style-loader', 'css-loader']
             })
-            returner.output.publicPath = "/"
+            returner.output.publicPath = "dist"
             returner.devtool = "eval"
             returner.devServer = {
-                contentBase: path.join(__dirname, "/dist"),
+                contentBase: path.join(__dirname, "dist"),
                 port: devServerPort,
                 stats: {colors: true},
                 watchOptions: {
