@@ -3,7 +3,13 @@
   "version": "0.4.0",
   "description": "Growth Fontain Single Page Application",
   "main": "index.js",
+  "jscsConfig": {
+    "maxErrors": 100
+  },
   "scripts": {
+    "dist": "gulp styles && cp -rf src/img dist/ && cp -rf src/js dist/ && cp src/BingSiteAuth.xml dist/ && cp -rf src/index.html dist/",
+    "serve": "webpack-dev-server --config webpack.config2.js --progress --watch",
+    "start": "webpack --config webpack.config2.js --progress",
     "lint": "jshint src/**/*.js",
     "jscs": "jscs src/**/*.js",
     "sass-lint": "sass-lint -c ./.sass-link.yml  '**/*.scss' -v -q"
@@ -60,8 +66,8 @@
     "svg-url-loader": "^1.1.1",
     "tether": "^1.3.3",
     "url-loader": "^0.5.7",
-    "webpack": "^2.2.0",
-    "webpack-dev-server": "^2.2.0",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1",
     "webpack-uglify-js-plugin": "^1.1.9"
   },
   "dependencies": {

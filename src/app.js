@@ -3,6 +3,8 @@ global.config = require('config');
 global.$ = global.jQuery = require('jquery');
 global._ = require('underscore');
 window.Tether = require('tether');
+
+
 global.Backbone = require('backbone');
 global.Bootstrap = require('bootstrap/dist/js/bootstrap.js');
 global.OwlCarousel = require('owl.carousel/dist/owl.carousel.min.js');
