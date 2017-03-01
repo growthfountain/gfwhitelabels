@@ -3,10 +3,13 @@
   "version": "0.4.0",
   "description": "Growth Fontain Single Page Application",
   "main": "index.js",
+  "jscsConfig": {
+    "maxErrors": 100
+  },
   "scripts": {
-    "start": "webpack-dev-server --config ./webpack.config.js",
-    "build": "webpack -p --config ./webpack.config.production.js",
-    "webpack_analyzer": "webpack --json | ./node_modules/webpack-bundle-size-analyzer/webpack-bundle-size-analyzer",
+    "dist": "gulp styles && cp -rf src/img dist/ && cp -rf src/js dist/ && cp src/BingSiteAuth.xml dist/ && cp -rf src/index.html dist/",
+    "serve": "webpack-dev-server --config webpack.config2.js --progress --watch",
+    "start": "webpack --config webpack.config2.js --progress",
     "lint": "jshint src/**/*.js",
     "jscs": "jscs src/**/*.js",
     "sass-lint": "sass-lint -c ./.sass-link.yml  '**/*.scss' -v -q",
@@ -62,9 +65,10 @@
     "style-loader": "^0.12.4",
     "tether": "^1.3.3",
     "url-loader": "^0.5.7",
-    "webpack": "^1.13.2",
-    "webpack-bundle-size-analyzer": "^2.0.2",
-    "webpack-dev-server": "^1.14.1"
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1",
+    "webpack-uglify-js-plugin": "^1.1.9",
+    "webpack-bundle-size-analyzer": "^2.0.2"
   },
   "dependencies": {
     "backbone": "git+https://github.com/jashkenas/backbone.git",
@@ -88,7 +92,7 @@
     "pug-walk": "0.0.4",
     "requirejs": "^2.2.0",
     "socket.io": "^1.4.8",
-    "socket.io-client": "^1.4.8",
+    "socket.io-client": "^1.7.3",
     "underscore": "^1.8.3"
   }
 }

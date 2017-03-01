@@ -1,4 +1,4 @@
-let exports = {
+let exp = {
   outstandingSecurityType(index, values, fields) {
     let value = values.security_type;
     let resultVal = '';
@@ -19,4 +19,4 @@ let exports = {
   },
 }
 
-module.exports = exports;
+module.exports = exp;
