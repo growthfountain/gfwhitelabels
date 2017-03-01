@@ -97,7 +97,6 @@ module.exports = {
       'click .save-and-continue': 'submit',
       // 'submit form': 'submit',
       'click .link-2': 'openPdf',
-      'click .submit_formc': submitFormc,
       'keyup #full_name': 'changeSign',
       'click #pay-btn': 'stripeSubmit',
     }, menuHelper.events, yesNoHelper.events, /*leavingConfirmationHelper.events*/),
@@ -142,8 +141,10 @@ module.exports = {
       return this;
     },
 
-    formData () {
+    setFormData () {
       this.formData = this.$el.find('form').serializeJSON();
+      this.formData.is_paid = this.model.is_paid;
+      return this.formData;
     },
 
     saveEsign() {
@@ -151,6 +152,7 @@ module.exports = {
       const reqUrl = global.esignServer + '/pdf-doc';
       const formData = this.getDocMetaData();
       const data = [{
+        object_id: this.model.id,
         type: typeOfDocuments[listingAgreement],
         meta_data: formData,
         template: listingAgreement
@@ -171,7 +173,7 @@ module.exports = {
     },
 
     getDocMetaData () {
-      const formData = this.formData;
+      const formData = this.formData || this.setFormData();
       const issuer_legal_name = app.user.get('first_name') + ' ' + app.user.get('last_name');
       
       return {
@@ -181,6 +183,7 @@ module.exports = {
         nonrefundable_fees: companyFees.nonrefundable_fees,
         amendment_fee: companyFees.amendment_fee,
         commencement_date_x: this.getCurrentDate(),
+        commitment_date_x: this.getCurrentDate(),
         zip_code: app.user.company.zip_code,
         city: app.user.company.city,
         state: app.user.company.state,
@@ -195,7 +198,7 @@ module.exports = {
     },
 
     _success(data, newData) {
-      this.saveEsign(data);
+      if (this.formData && !this.formData.is_paid) this.saveEsign(data);
       formcHelpers.updateFormcMenu(formcHelpers.formcCalcProgress(app.user.formc));
       return 1;
     },
@@ -212,7 +215,7 @@ module.exports = {
     stripeSubmit(e) {
       e.preventDefault();
       
-      this.formData()
+      this.setFormData();
       let $stripeForm = $('.payment-block');
 
       function validateCard(form, selectors) {
@@ -268,7 +271,7 @@ module.exports = {
       }
 
       if (!this.eSignFullName.val().trim()) {
-        validation.invalidMsg({ $: $ }, 'full-name', ['Check your name']);
+        validation.invalidMsg({ $: $, $el: $('#content'), }, 'full-name', ['Check your name']);
         $payBtn.prop('disabled', false);
         return;
       }
@@ -279,9 +282,8 @@ module.exports = {
 
       Stripe.card.createToken(card, (status, stripeResponse) => {
         if (stripeResponse.error) {
-          validation.invalidMsg({ $: $ }, 'form-section', [stripeResponse.error.message]);
+          validation.invalidMsg({ $: $, $el: $('#content'), }, 'card_number', [stripeResponse.error.message]);
           $payBtn.prop('disabled', false); // Re-enable submission
-          $('#certify').scrollTo(20);
           app.hideLoading();
           return;
         }
@@ -290,7 +292,7 @@ module.exports = {
           stripeToken: stripeResponse.id
         }).done((formcResponse, statusText, xhr) => {
           if (xhr.status !== 200) {
-            validation.invalidMsg({'$': $}, "expiration-block",
+            validation.invalidMsg({'$': $, $el: $('#content'),}, "expiration-block",
               [formcResponse.description || 'Some error message should be here']);
 
             $payBtn.prop('disabled', false);
@@ -1935,7 +1937,6 @@ module.exports = {
         this.$('.help-block').prev().scrollTo(5);
         return;
       } else {
-        debugger;
 
         if(e.currentTarget.dataset.update == -1) {
           this.$el.find('.outstanding_securities_block').show();
