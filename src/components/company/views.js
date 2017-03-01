@@ -10,7 +10,7 @@ module.exports = {
 
     render() {
 
-      require('bootstrap-select/sass/bootstrap-select.scss');
+      // r equire('bootstrap-select/sass/bootstrap-select.scss');
 
       let selectPicker = require('bootstrap-select');
       this.$el.html('');
@@ -210,7 +210,7 @@ module.exports = {
     render() {
       const socialMediaScripts = require('helpers/shareButtonHelper.js');
       const fancybox = require('components/fancybox/js/jquery.fancybox.js');
-      const fancyboxCSS = require('components/fancybox/css/jquery.fancybox.css');
+      // const f ancyboxCSS = require('components/fancybox/css/jquery.fancybox.css');
 
       this.$el.html(
         this.template({

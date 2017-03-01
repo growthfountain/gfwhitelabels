@@ -18,7 +18,7 @@ const moment = require('moment');
 const FINANCIAL_INFORMATION = require('consts/financialInformation.json');
 
 import 'bootstrap-slider/dist/bootstrap-slider'
-import 'bootstrap-slider/dist/css/bootstrap-slider.css'
+// i mport 'bootstrap-slider/dist/css/bootstrap-slider.css'
 
 
 module.exports = {

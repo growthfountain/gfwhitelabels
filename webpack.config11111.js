@@ -15,7 +15,7 @@ let config = function (env) {
         entry: entryFile,
         
         resolve: {
-            extensions: ['.js', '.pug', '.sass', '.scss'],
+            extensions: ['.js', '.pug',],
             modules: [path.join(__dirname, ''), path.join(__dirname, './src'), 'node_modules'],
             alias: {
                 'src': path.resolve(__dirname, 'src/'),
@@ -28,7 +28,8 @@ let config = function (env) {
             devtoolLineToLine: true,
             filename: '[hash].[name].js',
             sourceMapFilename: "[hash].[name].js.map",
-            path: path.join(__dirname, 'dist')
+            path: path.join(__dirname, 'dist'),
+						publicPath: '/',      
         },
         
         module: {
@@ -63,12 +64,6 @@ let config = function (env) {
                     minifyCSS: true
                 }
             }),
-            new HtmlWebpackPlugin({
-                title: 'Backbone App',
-                template: './src/index.html',
-                filename: 'index.html',
-                inject: 'body' // Inject all scripts into the body
-        }),
             new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
@@ -78,16 +73,16 @@ let config = function (env) {
         })
         ]
     }
-    
-    if (typeof env == "undefined" || typeof env.devserver == "undefined") {
-        returner.plugins.push(new ExtractTextPlugin("styles.css"))
-        returner.module.rules.push({
-            test: /\.css$/, use: ExtractTextPlugin.extract({
-                fallbackLoader: "style-loader",
-                loader: "css-loader"
-            })
-        })
-    }
+
+		if (typeof env == "undefined" || typeof env.devserver == "undefined") {
+			returner.plugins.push(new ExtractTextPlugin("styles.css"))
+			returner.module.rules.push({
+				test: /\.css$/, use: ExtractTextPlugin.extract({
+					fallbackLoader: "style-loader",
+					loader: "css-loader"
+				})
+			})
+		}
     
     if (env) {
         if (typeof env.devserver != 'undefined' && env.devserver) {

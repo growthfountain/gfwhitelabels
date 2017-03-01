@@ -1,8 +1,8 @@
-import './styles/style.sass'
-import calculatorHelper from '../../helpers/calculatorHelpers';
-import flyPriceFormatter from '../../helpers/flyPriceFormatter';
-import 'bootstrap-slider/dist/bootstrap-slider'
-import 'bootstrap-slider/dist/css/bootstrap-slider.css'
+// i mport './styles/style.sass'
+import calculatorHelper from '../../helpers/calculatorHelpers.js';
+import flyPriceFormatter from '../../helpers/flyPriceFormatter.js';
+import 'bootstrap-slider/dist/bootstrap-slider.js'
+// i mport 'bootstrap-slider/dist/css/bootstrap-slider.css'
 
 const calculatorValidationHelper = require('helpers/calculatorValidationHelper.js');
 

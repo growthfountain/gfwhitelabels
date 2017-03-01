@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
@@ -91,14 +90,12 @@ module.exports = {
     ],
   },
   plugins: [
-    new ExtractTextPlugin('style.css'),
     new HtmlWebpackPlugin({
       title: 'Backbone App',
       template: './src/index.html',
       filename: 'index.html',
       inject: 'body', // Inject all scripts into the body
     }),
-    new ExtractTextPlugin('styles.css'),
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
