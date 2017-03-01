@@ -1,52 +1,83 @@
 const mainContent = '#content';
 const campaignHelper = require('components/campaign/helpers.js');
+const defaultOptions = {
+  titlePrefix: 'Check out ',
+  descriptionPrefix: '',
+};
+
+const CORPORATE_STRUCTURE = require('consts/raisecapital/corporate_structure.json');
+
+function stripHtml(content) {
+  if (!_.isString(content))
+    return content;
+
+  return content.replace(/(<([^>]+)>)/ig,"");
+}
 
 class SocialNetworks {
-  constructor(company) {
+  constructor() {
     this.template = require('./templates/social.pug');
 
-    this.model = company;
+    this.__loadScripts();
 
-    const companyName = this.model.short_name || this.model.name || '';
-    const url = window.location.origin + '/' + this.model.id;
-
-    this.data = {
-      url: url,
-      title: 'Check out ' + companyName + '\'s fundraise on GrowthFountain.com',
-      description: this.model.description || '',
-      caption: this.model.campaign.caption || '',
-      picture: campaignHelper.getImageCampaign(this.model.campaign),
-      text: 'Check out ' + companyName + '\'s fundraise on @growthfountain '
-    };
-
-    this.shareLinks = {
-      facebook: this.getFacebookLink(this.data),
-      twitter: this.getTwitterLink(this.data),
-      linkedin: this.getLinkedinLink(this.data),
-      mailTo: this.getMailToLink(this.data),
-      google_plus: this.getGooglePlusLink(this.data),
-    };
+    this.__eventsAttached = false;
 
     return this;
   }
 
-  attachEvents() {
-
-    let $mainContent = $(mainContent);
-
-    $mainContent.on('click', '.facebook-share', this.socialPopup.bind(this));
-
-    $mainContent.on('click', '.twitter-share', this.socialPopup.bind(this));
-
-    $mainContent.on('click', '.linkedin-share', this.shareLinkedin.bind(this));
-
-    $mainContent.on('click', '.email-share', this.socialPopup.bind(this));
+  __loadScripts() {
+    let script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = '//platform.linkedin.com/in.js';
+    script.innerHTML = 'api_key: ' + linkedinClientId;
+    $(document.head).append(script);
   }
 
-  render() {
-    let html = this.template({
-      links: this.shareLinks,
-    });
+  attachEvents() {
+    if (this.__eventsAttached)
+      return;
+
+    let $page = $('#page');
+    $page.on('click', mainContent + ' .facebook-share', this.socialPopup);
+    $page.on('click', mainContent + ' .twitter-share', this.socialPopup);
+    $page.on('click', mainContent + ' .linkedin-share', this.shareLinkedin.bind(this));
+    //default logic will work for sharing via mailto links
+    // $page.on('click', mainContent + ' .email-share', this.socialPopup);
+
+    this.__eventsAttached = true;
+  }
+
+  __initTemplateData(model={}, options={}) {
+    options = _.extend({}, defaultOptions, options);
+
+    const companyName = model.short_name || model.name || '';
+    let corporateStructure = (CORPORATE_STRUCTURE[model.corporate_structure] || '');
+    corporateStructure += corporateStructure ? ' ' : '';
+
+    const data = {
+      url: window.location.origin + '/' + model.id,
+      title: stripHtml(options.titlePrefix + companyName + '\'s ' + corporateStructure + 'on GrowthFountain.com '),
+      description: stripHtml(options.descriptionPrefix + (model.description || '')),
+      picture: campaignHelper.getImageCampaign(model.campaign),
+      text: stripHtml(options.titlePrefix + companyName + '\'s ' + corporateStructure + 'on @growthfountain '),
+    };
+
+    return {
+      links:  {
+        facebook: this.getFacebookLink(data),
+        twitter: this.getTwitterLink(data),
+        linkedin: this.getLinkedinLink(data),
+        mailTo: this.getMailToLink(data),
+        google_plus: this.getGooglePlusLink(data),
+      },
+      data: data,
+    };
+  }
+
+  render(...args) {
+    let html = this.template(
+      this.__initTemplateData(...args)
+    );
 
     this.attachEvents();
 
@@ -54,19 +85,20 @@ class SocialNetworks {
   }
 
   loginLinkedin () {
-    const promise = new Promise( (resolve, reject) => IN.User.authorize(resolve) );
-    return promise;
+    return new Promise( (resolve, reject) => IN.User.authorize(resolve) );
   }
 
   shareLinkedin (e) {
     e.preventDefault();
 
+    let $link = $(e.target).closest('a');
+
     const payload = {
       content: {
-        'title': this.data.title,
-        'description': this.data.description,
-        'submitted-url': this.data.url,
-        'submitted-image-url': this.data.picture,
+        'title': $link.data('title'),
+        'description': $link.data('description'),
+        'submitted-url': $link.data('url'),
+        'submitted-image-url': $link.data('picture'),
       },
       'visibility': {
         'code': 'anyone'
@@ -75,10 +107,10 @@ class SocialNetworks {
 
     this.loginLinkedin().then((res) => {
       IN.API.Raw('/people/~/shares?format=json')
-      .method('POST')
-      .body(JSON.stringify(payload))
-      .result( console.log.bind(console, 'linkedin success: ') )
-      .error( console.log.bind(console, 'linkedin error: ') );
+        .method('POST')
+        .body(JSON.stringify(payload))
+        .result(() => {alert('You\'ve just shared the page to LinkedIn')})
+        .error( console.log.bind(console, 'linkedin error: ') );
     })
 
   }
@@ -86,13 +118,7 @@ class SocialNetworks {
   socialPopup(e) {
     e.preventDefault();
 
-    var popupOpt = e.currentTarget.dataset.popupOpt || 'toolbar=0,status=0,left=45%,top=45%,width=626,height=436';
-    var windowChild = window.open(e.currentTarget.href, '', popupOpt);
-
-    if (e.currentTarget.dataset.close) {
-      let closeScript = "<script>setTimeout(window.close.bind(window), 400);</script>";
-      windowChild.document.write(closeScript);
-    }
+    window.open(e.currentTarget.href, '', 'toolbar=0,status=0,left=45%,top=45%,width=626,height=436');
 
     return false;
   }
@@ -104,7 +130,7 @@ class SocialNetworks {
               '&text=' + values.text;
   }
 
-  //{ app_id, url, description, locale, picture, title, caption }
+  //{ app_id, url, description, locale, picture, title }
   getFacebookLink(values) {
     return 'https://www.facebook.com/dialog/share' +
               '?app_id=' + facebookClientId +
@@ -113,7 +139,7 @@ class SocialNetworks {
               '&locale=en_US' +
               '&picture=' + values.picture +
               '&title=' + (values.title || '') +
-              '&caption=Shared by FINRA approved company';
+              '&caption=' + window.location.host.toUpperCase();
   }
 
   //{ url, title, description || summary, source }
@@ -139,6 +165,13 @@ class SocialNetworks {
   }
 }
 
-module.exports = (...args) => {
-  return new SocialNetworks(...args)
-};
+let __instance = null;
+
+function getInstance() {
+  if (!__instance)
+    __instance = new SocialNetworks();
+
+  return __instance;
+}
+
+module.exports = getInstance();
