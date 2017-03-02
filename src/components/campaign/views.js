@@ -29,9 +29,9 @@ module.exports = {
     },
 
     render() {
-      //r equire('sass/pages/_campaing.sass');
+      require('sass/pages/_campaing.sass');
 
-      // r equire('bootstrap-select/sass/bootstrap-select.scss');
+      require('bootstrap-select/sass/bootstrap-select.scss');
 
       let selectPicker = require('bootstrap-select');
       this.$el.html('');

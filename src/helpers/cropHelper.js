@@ -1,7 +1,7 @@
 const CROP_IMG_CLASS = 'img-crop';
 const CROP_IMG_PROFILE_CLASS = 'img-profile-crop';
 
-// r equire('cropperjs/dist/cropper.css');
+require('cropperjs/dist/cropper.css');
 const Cropper = require('cropperjs').default;
 
 module.exports = {

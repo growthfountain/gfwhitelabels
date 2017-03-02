@@ -570,7 +570,7 @@ module.exports = {
         template = require('components/formc/templates/teamMembersShareHolder.pug');
       }
 
-      // r equire('bootstrap-select/sass/bootstrap-select.scss');
+      require('bootstrap-select/sass/bootstrap-select.scss');
       let selectPicker = require('bootstrap-select');
 
       this.$el.html(
