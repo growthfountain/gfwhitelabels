@@ -125,7 +125,7 @@ class User {
     console.log(data);
     const infoRequest = data.info ? null : api.makeRequest(app.config.authServer + '/info',  'GET');
     $.when(infoRequest).done((responseData) => {
-      this.data = _.extend({}, this.data, responseData || data);
+      this.data = Object.assign({}, this.data, responseData || data);
       this.data.image_image_id = new app.models.Image(
         app.config.authServer + '/rest-auth/data',
         data.image_data

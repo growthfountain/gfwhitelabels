@@ -117,7 +117,7 @@ module.exports = {
             code: code,
           };
 
-          const i = new View.membershipConfirmation(_.extend({
+          const i = new View.membershipConfirmation(Object.assign({
             el: '#content',
           }, data));
           i.render();

@@ -6,7 +6,7 @@ let __instance = null;
 class Notifications {
 
   constructor() {
-    _.extend(this, Backbone.Events);
+    Object.assign(this, Backbone.Events);
     this.__socket = io(app.config.notificationsServer);
     this.__socket.on('connect', () => {
       this.__socket.emit('subscribe', {
@@ -20,7 +20,7 @@ class Notifications {
   }
 
   __attachEvents() {
-    _.each(channels, (channel) => {
+    channels.forEach((channel) => {
       this.__socket.on(channel, (data) => {
         if (data === null || typeof data[Symbol.iterator] !== 'function')
           data = [data];

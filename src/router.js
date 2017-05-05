@@ -14,18 +14,19 @@ const componentRoutes = [
 
 const checkSafeExtend = (dest={}, src={}) => {
   let keys = Object.keys(dest);
-  _(keys).each((key) => {
-    if (src[key])
+  keys.forEach((key) => {
+    if (src[key]) {
       console.error(`Method ${key} is already in Router`, src);
+    }
   });
 };
 
-const routesMap = _.reduce(componentRoutes, (dest, route) => {
+const routesMap = Array.reduce(componentRoutes, (dest, route) => {
   checkSafeExtend(dest.routes, route.routes);
   checkSafeExtend(dest.methods, route.methods);
 
-  dest.routes = _.extend(dest.routes, route.routes);
-  dest.methods = _.extend(dest.methods, route.methods);
+  dest.routes = Object.assign(dest.routes, route.routes);
+  dest.methods = Object.assign(dest.methods, route.methods);
   if (Array.isArray(route.auth)) {
     dest.auth = dest.auth.concat(route.auth);
   } else if (route.auth === '*') {
@@ -40,8 +41,8 @@ const notFound = () => {
   app.hideLoading();
 };
 
-module.exports = Backbone.Router.extend(_.extend({
-  routes: _.extend({}, routesMap.routes, { '*notFound': notFound }),
+module.exports = Backbone.Router.extend(Object.assign({
+  routes: Object.assign({}, routesMap.routes, { '*notFound': notFound }),
 
   initialize() {
   },
@@ -54,7 +55,7 @@ module.exports = Backbone.Router.extend(_.extend({
 
     app.clearClasses('#page', ['page']);
 
-    if (_.contains(routesMap.auth, name) && !app.user.ensureLoggedIn()) {
+    if (routesMap.auth.indexOf(name) != -1 && !app.user.ensureLoggedIn()) {
       return false;
     }
 

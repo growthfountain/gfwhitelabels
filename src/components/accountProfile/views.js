@@ -39,11 +39,11 @@ function initInvestment(i) {
 }
 
 module.exports = {
-  profile: Backbone.View.extend(_.extend({
+  profile: Backbone.View.extend(Object.assign({
     template: require('./templates/profile.pug'),
     urlRoot: app.config.authServer + '/rest-auth/data',
     doNotExtendModel: true,
-    events: _.extend({
+    events: Object.assign({
       'click #saveAccountInfo': api.submitAction,
       // 'click #saveFinancialInfo': api.submitAction,
       'change #not-qualify': 'changeQualify',
@@ -62,11 +62,11 @@ module.exports = {
 
       this.fields = options.fields;
 
-      this.fields.phone = _.extend(this.fields.phone, {
+      this.fields.phone = Object.assign(this.fields.phone, {
         required: true,
       });
 
-      this.fields.image_image_id = _.extend(this.fields.image_image_id, {
+      this.fields.image_image_id = Object.assign(this.fields.image_image_id, {
         templateDropzone: 'profileDropzone.pug',
         onSaved: (data) => {
           app.user.updateImage(data.file);
@@ -252,7 +252,7 @@ module.exports = {
       _.each(linkFields, (name) => {
         let field = this.$('#' + name);
         if (field.val()) {
-          fields[name] = _.extend({}, this.fields[name], { type: 'url' });
+          fields[name] = Object.assign({}, this.fields[name], { type: 'url' });
           data[name] = field.val();
         }
       });

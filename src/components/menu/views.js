@@ -129,7 +129,7 @@ module.exports = {
 
     countUnreadMessages() {
       let count = 0;
-      _.each(this.model.data, (n) => {
+      this.model.data.forEach((n) => {
         count += n.read_flag ? 0 : 1;
       });
       return count;

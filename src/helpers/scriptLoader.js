@@ -11,7 +11,7 @@ const createScript = (url, options={}) => {
   return script;
 };
 
-const scriptLoader = _.extend({
+const scriptLoader = Object.assign({
   load(url) {
     return new Promise((resolve, reject) => {
       if (!url)

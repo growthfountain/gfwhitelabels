@@ -114,6 +114,7 @@ module.exports = {
     },
 
     initialize(options) {
+      this.fields = {};
     },
 
     render() {

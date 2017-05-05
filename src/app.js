@@ -102,7 +102,7 @@ class App {
       'CompleteRegistration',
     ];
 
-    let trackType = (_.contains(STANDARD_EVENTS, eventName)) ? 'track' : 'trackCustom';
+    let trackType = STANDARD_EVENTS.indexOf(eventName) != -1 ? 'track' : 'trackCustom';
 
     safeDataLayerPush({
       event: 'fb-pixel-event',
@@ -161,7 +161,8 @@ class App {
 
   getParams() {
     // gets url parameters and builds an object
-    return _.chain(location.search.slice(1).split('&'))
+    // Fixme why do we need chain here ?
+    return location.search.slice(1).split('&')
       .map(function (item) {
         if (item) {
           let arr = item.split('=');
@@ -169,9 +170,6 @@ class App {
           return arr;
         }
       })
-      .compact()
-      .object()
-      .value();
   }
 
   valByKey(obj, keyString) {

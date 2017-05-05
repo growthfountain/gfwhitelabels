@@ -1,3 +1,6 @@
+const Backbone = require('backbone.js');
+global.Backbone = Backbone;
+
 require('src/sass/mixins_all.sass');
 require('babel-polyfill');
 require('jquery-serializejson/jquery.serializejson.min.js');
@@ -319,7 +322,8 @@ $.fn.equalHeights = function () {
 
 
 Backbone.View.prototype.assignLabels = function () {
-  _(this.fields).each((el, key) => {
+  Object.keys(this.fields).forEach((key) => {
+    el = this.fields[key];
     if (el.type == 'nested') {
       _(el.schema).each((subel, subkey) => {
         if (this.labels[key])
@@ -342,7 +346,7 @@ Backbone.View.prototype.checkForm = function () {
   }
 };
 
-$.serializeJSON.defaultOptions = _.extend($.serializeJSON.defaultOptions, {
+$.serializeJSON.defaultOptions = Object.assign($.serializeJSON.defaultOptions, {
   customTypes: {
     decimal(val) {
       return app.helpers.format.unformatPrice(val);

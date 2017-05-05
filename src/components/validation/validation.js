@@ -24,8 +24,8 @@ module.exports = {
     // we need get all keys and show error for each key
     // individually
     if (Array.isArray(error) !== true && typeof error == 'object') {
-      _(error).forEach((el, k) => {
-        _(el).forEach((errors, key) => {
+      error.forEach((el, k) => {
+        el.forEach((errors, key) => {
           this.invalidMsg(view, attr + '__' + k + '__' + key, errors, selector);
         });
       });
@@ -98,7 +98,8 @@ module.exports = {
   },
 
   runRules(attr, name) {
-    _(attr).each((value, prop) => {
+    Object.keys(attr).forEach((prop) => {
+      let value = attr[prop];
       if (fixedProps.indexOf(prop) == -1) {
         this.runRule(prop, value, name, attr);
       }
@@ -111,10 +112,11 @@ module.exports = {
     this.finalResult = true;
     this.errors = {};
 
-    _(schema).each((attr, name) => {
+    Object.keys(schema).forEach((name) => {
       // TODO
       // How to check nested one element if that can be blank ?
       // requiredTemp - temp fix to validate fields on investment page only
+      attr = schema[name];
       if (attr.type == 'nested' && attr.requiredTemp == true) {
         _(attr.schema).each((attr, subname) => {
           if (fixedRegex.indexOf(attr.type) != -1) {

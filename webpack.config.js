@@ -26,12 +26,6 @@ let plugins = [
     'window.jQuery': 'jquery',
     'Tether': 'tether',
     'window.Tether': 'tether',
-    '_': 'underscore',
-    'Backbone': 'backbone',
-  }),
-  new webpack.optimize.CommonsChunkPlugin({
-    names: ['vendor'],
-    minChunks: 2,
   }),
   new webpack.EnvironmentPlugin({
     NODE_ENV: 'development',
