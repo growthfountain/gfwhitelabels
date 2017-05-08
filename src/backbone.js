@@ -26,6 +26,68 @@ function isEmpty(obj) {
 	return Object.keys(obj).length === 0;
 };
 
+
+// Similar to ES6's rest param (http://ariya.ofilabs.com/2013/03/es6-and-rest-parameter.html)
+// This accumulates the arguments passed into an array, after a given index.
+var restArgs = function(func, startIndex) {
+	startIndex = startIndex == null ? func.length - 1 : +startIndex;
+	return function() {
+		var length = Math.max(arguments.length - startIndex, 0),
+		rest = Array(length),
+		index = 0;
+		for (; index < length; index++) {
+			rest[index] = arguments[index + startIndex];
+		}
+		switch (startIndex) {
+			case 0: return func.call(this, rest);
+			case 1: return func.call(this, arguments[0], rest);
+			case 2: return func.call(this, arguments[0], arguments[1], rest);
+		}
+		var args = Array(startIndex + 1);
+		for (index = 0; index < startIndex; index++) {
+			args[index] = arguments[index];
+		}
+		args[startIndex] = rest;
+		return func.apply(this, args);
+	};
+};
+
+// Partially apply a function by creating a version that has had some of its
+// arguments pre-filled, without changing its dynamic `this` context. _ acts
+// as a placeholder by default, allowing any combination of arguments to be
+// pre-filled. Set `_.partial.placeholder` for a custom placeholder argument.
+var partial = restArgs(function(func, boundArgs) {
+	var placeholder = partial.placeholder;
+	var bound = function() {
+		var position = 0, length = boundArgs.length;
+		var args = Array(length);
+		for (var i = 0; i < length; i++) {
+			args[i] = boundArgs[i] === placeholder ? arguments[position++] : boundArgs[i];
+		}
+		while (position < arguments.length) args.push(arguments[position++]);
+		return executeBound(func, bound, this, this, args);
+	};
+	return bound;
+});
+
+partial.placeholder = '';
+
+// Returns a function that will only be executed up to (but not including) the Nth call.
+var before = function(times, func) {
+	var memo;
+	return function() {
+		if (--times > 0) {
+			memo = func.apply(this, arguments);
+		}
+		if (times <= 1) func = null;
+		return memo;
+	};
+};
+
+// Returns a function that will be executed at most one time, no matter how
+// often you call it. Useful for lazy initialization.
+var once = partial(before, 2);
+
 var Events = Backbone.Events = {};
 
 // Regular expression used to split event strings.
@@ -234,7 +296,7 @@ Events.listenToOnce = function(obj, name, callback) {
 // `offer` unbinds the `onceWrapper` after it has been called.
 var onceMap = function(map, name, callback, offer) {
 	if (callback) {
-		var once = map[name] = _.once(function() {
+		var once = map[name] = once(function() {
 			offer(name, once);
 			callback.apply(this, arguments);
 		});
