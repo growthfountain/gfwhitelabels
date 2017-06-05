@@ -11,6 +11,7 @@ module.exports = {
     'account/after-complete-dashboard': 'afterCompleteDashboard',
     'account/after-final-submit-dashboard': 'afterFinalDashboard',
     'account/after-submitting-goverment-dashboard': 'afterSubmittingGovermentDashboard',
+    'account/unsubscribe': 'unsubscribe',
     'dashboard/:id/issuer-dashboard': 'issuerDashboard',
   },
   methods: {
@@ -206,6 +207,25 @@ module.exports = {
       }, 'profile_chunk');
     },
 
+    unsubscribe() {
+      require.ensure([], (require) => {
+        const View = require('components/accountProfile/views.js');
+        const fieldsR = api.makeCacheRequest(app.config.authServer + '/rest-auth/data', 'OPTIONS');
+        const dataR = api.makeCacheRequest(app.config.authServer + '/rest-auth/data');
+
+        $.when(fieldsR, dataR).done((fields, data) => {
+          app.user.updateUserData(data[0]);
+          const i = new View.unsubscribe({
+            el: '#content',
+            model: app.user,
+            fields: fields[0].fields
+          });
+          i.render();
+          app.hideLoading();
+        });
+      }, 'profile_chunk');
+    },
+
   },
   auth: [
     'accountProfile',
@@ -218,5 +238,6 @@ module.exports = {
     'afterFinalDashboard',
     'afterSubmittingGovermentDashboard',
     'issuerDashboard',
+    'unsubscribe',
   ],
 };

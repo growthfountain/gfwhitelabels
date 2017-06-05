@@ -689,4 +689,33 @@ module.exports = {
     },
   }),
 
+  unsubscribe: Backbone.View.extend({
+    urlRoot: app.config.authServer + '/rest-auth/data',
+    template: require('./templates/unsubscribe.pug'),
+    events: {
+      'submit form': api.submitAction,
+    },
+
+    initialize(options) {
+      this.model = options.model.data;
+      this.fields = options.fields;
+    },
+
+    render() {
+      this.$el.html(
+        this.template({
+          user: this.model,
+          fields: this.fields,
+          view: this
+        })
+      );
+
+      return this;
+    },
+
+    getSuccessUrl() {
+      return '/account/profile';
+    },
+  }),
+
 };
