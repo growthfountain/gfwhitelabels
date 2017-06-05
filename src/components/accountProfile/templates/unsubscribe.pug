@@ -1,0 +1,23 @@
+-
+  var auth = require('consts/auth/user.json');
+  var rolesConsts = require('consts/team_member/roles.json');
+  var countryDirective = require('directives/country/index.js');
+  var ssnDirective = require('directives/ssn/index.js');
+  var imageDropzone = require('directives/setdropzone/image.js'); 
+
+  pug_html += app.breadcrumbs('Profile', '', [ ['Home', '/'], ['Profile', ''],]);
+
+.container.profile.pt-50
+  .row
+    aside.col-xl-3.col-lg-4.m-b-1
+      form(action="").form.form-section
+      .row
+        h4 Are you sure you want to unsubscribe?
+        form
+          input(
+            name='settings'
+            value=(app.user.settings + 1)
+          )
+          button(
+            data-method="PATCH"
+          ).btn.btn-primary.pull-lg-right Update
