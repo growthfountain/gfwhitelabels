@@ -13,7 +13,6 @@ section.campaing-list.campaign-list-main-page
       h2.text-uppercase.text-sm-center.text-xs-center.m-t-0 !{app.config.indexPage.campaignListTitle}
     include ../components/campaign/templates/_list
     .col-lg-12.text-lg-center.text-md-center.text-xs-center
-      - debugger;
       if collection && collection.count && collection.count > GENERAL.COMPANIES_ON_MAINPAGE
         a(href="/companies").btn.btn-sm.btn-secondary.btn-see-all 
           | See All
@@ -27,7 +26,7 @@ section.main-video-wrap
       .container
         .col-xl-12
           h2.text-uppercase !{app.config.indexPage.videoTitle}
-        .col-xl-12.text-video-wrap
+        .col-xl-12.text-video-wrap.p-x-0
           | !{app.config.indexPage.videoText}
     a(
       href='#'
@@ -40,6 +39,10 @@ section.main-video-wrap
       i.fa.fa-play
 section.home-our-partners
   .container-fluid
+    .col-xl-12
+      .partners-line
+        hr
+        h4.text-uppercase.center-title GrowthFountain Powers Equity Crowdfunding for these Partners:
     .col-xl-2.col-lg-4.col-md-4.col-sm-6.col-xs-12.item
       a(href="http://www.callahan.com/" target="_blank")
         img(src=require("images/partners-logo/callahan-logo.png") alt="").img-fluid.callahan
