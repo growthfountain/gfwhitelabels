@@ -59,6 +59,9 @@ module.exports = Backbone.Router.extend(_.extend({
     if(app.seo.title[window.location.pathname]) {
       document.title = app.seo.title[window.location.pathname];
       document.head.querySelector('meta[name="description"]').content = app.seo.meta[window.location.pathname];
+    } else {
+      document.title = app.seo.title.default;
+      document.head.querySelector('meta[name="description"]').content = app.seo.meta.default;
     }
 
     if (!app.user.is_anonymous()) {

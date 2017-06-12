@@ -1,6 +1,7 @@
 var config = require('./config.js');
 
 var titles = {
+  'default': 'Own a piece of American Small Business' + config.siteTitle,
   '/': 'Own a piece of American Small Business' + config.siteTitle,
   '/companies': 'Explore Investment Opportunities' + config.siteTitle,
   '/raise-capital': 'Raise your Round From the Crowd' + config.siteTitle,
@@ -36,6 +37,7 @@ var titles = {
 };
 
 var metas = {
+  'default': 'Invest in Start-ups and small businesses for as little as $100. Support entrepreneurs locally and nationally.',
   '/': 'Invest in Start-ups and small businesses for as little as $100. Support entrepreneurs locally and nationally.',
   '/companies': 'Explore the companies currently raising financing on GrowthFountain. Start investing today with as little as $100. ',
   '/raise-capital': 'Turn your customers into owners and access our Investor Network. Raise $25,000 - $1mil. ',
