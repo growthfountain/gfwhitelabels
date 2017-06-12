@@ -2,4 +2,9 @@
 
 if config.googleTagID
   noscript
-    | &lt;iframe src="https://www.googletagmanager.com/ns.html?id=#{ config.googleTagID }" height="0" width="0" style="display:none;visibility:hidden;"&gt;&lt;/iframe&gt;
+    iframe(
+      src="https://www.googletagmanager.com/ns.html?id="+config.googleTagID
+      height="0"
+      width="0"
+      style="display:none;visibility:hidden;"
+    )
