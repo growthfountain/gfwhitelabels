@@ -56,25 +56,24 @@ section.formc-team-members-director.container.m-b-85
           placeholder: 'Description',
           value: values.terms_of_securities,})
 
-        - 
-          pug_html += app.fields.textareaLabel('security_differences', {
-          schema: fields.security_differences,
-          class1: 'col-xl-12 text-xl-left',
-          class2: 'col-xl-12 big-textarea',
-          value: values.security_differences,})
+        //
+          - 
+            pug_html += app.fields.textareaLabel('security_differences', {
+            schema: fields.security_differences,
+            class1: 'col-xl-12 text-xl-left',
+            class2: 'col-xl-12 big-textarea',
+            value: values.security_differences,})
 
-        - 
-          pug_html += app.fields.textareaLabel('exercise_of_rights', {
-          schema: fields.exercise_of_rights,
-          class1: 'col-xl-12 text-xl-left',
-          class2: 'col-xl-12 big-textarea',
-          value: values.exercise_of_rights,})
+          - 
+            pug_html += app.fields.textareaLabel('exercise_of_rights', {
+            schema: fields.exercise_of_rights,
+            class1: 'col-xl-12 text-xl-left',
+            class2: 'col-xl-12 big-textarea',
+            value: values.exercise_of_rights,})
         
         .row.form-group.form-section.required
           .col-lg-12
             label To the extent not already discussed above, are there any risks to the investors in this offering relating to any of the following:
-              br
-              | - minority ownership
               br
               | - additional issuances of securities
               br
@@ -85,7 +84,7 @@ section.formc-team-members-director.container.m-b-85
               | - transactions with related parties
               span.color-red *
           .col-lg-12.big-textarea
-            textarea(placeholder="Description" id="risks_to_purchasers" name="risks_to_purchasers").form-control= values['risks_to_purchasers']
+            textarea(placeholder="There is the risk that..." id="risks_to_purchasers" name="risks_to_purchasers").form-control= values['risks_to_purchasers']
         .col-lg-12.m-t-2
           .row
             .text-md-center.text-sm-center.text-xs-center

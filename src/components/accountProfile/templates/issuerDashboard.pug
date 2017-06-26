@@ -11,14 +11,14 @@
 section.issuer-dashbord-top
   .container
     .row
-      .col-md-4.text-xs-center.text-sm-center.text-md-left.text-lg-left.text-xl-left
+      .col-xl-4.col-lg-4.col-md-12.text-xs-center.text-sm-center.text-md-center.text-lg-left.text-xl-left
         .img_under_text
           img(src=campaign.list_image_image_id.getUrl() alt="")
           h2.text-uppercase.dosis.m-t-0 #{company.name}
           .timer_day #{campaign.daysLeft(company.approved_date)} Days Left
         .share-block.d-inline-block.share
           | !{ socialDirective.render(directiveKey, infoProvider) }
-      .col-md-2.col-sm-6.col-xs-6
+      .col-xl-2.col-lg-2.col-md-3.col-sm-6.col-xs-6
         .dashboard-stat
           .visual
             i.fa.fa-bar-chart
@@ -29,7 +29,7 @@ section.issuer-dashbord-top
                 data-value=campaign.amount_raised) $#{ campaign.amount_raised }
             .desc Amount Raised
 
-      .col-md-2.col-sm-6.col-xs-6
+      .col-xl-2.col-lg-2.col-md-3.col-sm-6.col-xs-6
         .dashboard-stat.dashboard-stat-v2.grey
           .visual
             i.fa.fa-briefcase
@@ -40,7 +40,7 @@ section.issuer-dashbord-top
                 data-value=company.number_of_investors) #{company.number_of_investors.toLocaleString('en-US')}
             .desc Number of Investments
 
-      .col-md-2.col-sm-6.col-xs-6
+      .col-xl-2.col-lg-2.col-md-3.col-sm-6.col-xs-6
         .dashboard-stat.dashboard-stat-v2.grey
           .visual
             i.fa.fa-users
@@ -51,7 +51,7 @@ section.issuer-dashbord-top
                 data-value=0) #{ company.total_views } 
             .desc Page Views
 
-      .col-md-2.col-sm-6.col-xs-6
+      .col-xl-2.col-lg-2.col-md-3.col-sm-6.col-xs-6
         .dashboard-stat.dashboard-stat-v2.grey
           .visual
             i.fa.fa-comments
@@ -62,7 +62,7 @@ section.issuer-dashbord-top
                 data-value=0).interactions-count 0
             .desc New Interactions
 
-      .col-md-7.col-sm-10.p-r-0.col-xs-10.hidden-xs-down
+      .col-xl-7.col-lg-7.col-md-10.col-sm-10.p-r-0.col-xs-10.hidden-xs-down
         .tpl-progress
           -
             var daysPassedPercents = campaign.daysPassedPercentage(company.approved_date);
@@ -89,11 +89,11 @@ section.issuer-dashbord-top
             p #{ moment(campaign.expiration_date).format('MM/DD/YYYY') }
             span End of campaign
           .clearfix
-      .col-md-1.col-sm-2.col-xs-2.hidden-xs-down
+      .col-xl-1.col-lg-1.col-md-2.col-sm-2.col-xs-2.hidden-xs-down
         .right_fixed_text.text-lg-center
           b #{ app.helpers.format.formatAmount(campaign.minimum_raise || campaign.maximum_raise)}
           span Goal
-      .col-md-8.col-sm-12.text-xs-center
+      .col-xl-8.col-lg-8.col-md-12.text-xs-center
         a(href="/" + company.slug).btn-sm.btn.btn-secondary.text-uppercase view Campaign
           i(aria-hidden="true").fa.fa-angle-right
     .col-lg-12.border-bottom-50
@@ -104,7 +104,7 @@ section.investors-dashbord-document
       .col-xl-12
         h2.text-uppercase documents with growthfountain
         a(href=formc.link_to_formc target="_blank").link-1
-          img(src=require('images/lrg_US_Department_of_State35.gif')).img-document.d-inline-block
+          img(src=require('images/icons/lrg_US_Department_of_State35.gif')).img-document.d-inline-block
           h3.d-inline-block.m-t-0.m-b-0.listing  Form C
         br
         a(href=app.config.esignServer + '/pdf-doc/investors/' + formc.id + '/' + 3 target="_blank").link-1
@@ -112,17 +112,228 @@ section.investors-dashbord-document
             i.fa.fa-file-pdf-o
           h3.d-inline-block.m-t-0.m-b-0.listing  Listing Agreement
         br
-        a(href=app.config.bucketServer + '/docs/GrowthFountain_Crowdfunding_Success_Checklist.pdf' target="_blank").link-1
+        a(href=require('doc/GrowthFountain_Crowdfunding_Success_Checklist.pdf') target="_blank").link-1
           h2.d-inline-block.m-t-1.m-b-0
             i.fa.fa-file-pdf-o
           h3.d-inline-block.m-t-0.m-b-0  GrowthFountain Crowdfunding Success Checklist
         br
-        a(href=app.config.bucketServer + '/docs/How_to_Run_a_Successful_Crowdfunding_Campaign_MoneyInc.pdf' target="_blank").link-1
+        a(href=require('doc/How_to_Run_a_Successful_Crowdfunding_Campaign_MoneyInc.pdf') target="_blank").link-1
           h2.d-inline-block.m-t-1.m-b-0
             i.fa.fa-file-pdf-o
           h3.d-inline-block.m-t-0.m-b-0  How to Run a Successful Crowdfunding Campaign
       .col-lg-12
         .border-bottom.m-t-3.m-b-0
+section.dashboard-import
+  .container
+    .row
+      .col-xl-12
+        h2.text-uppercase your contacts
+        p.text-justify Here you can import your contacts form LinkedIn and Google+. It allows you to make quick and convenient sending of the Emails right from this dashboard. Let`s people know about your campaign!
+    .row.m-t-1.m-b-3
+      .col-xl-12
+        form(enctype="multipart/form-data" action=app.config.authServer + '/import/linkedin')
+          input(type="file" name="file" id="linkedin_csv")
+          button(type="button" data-type="POST").importLinkedin import
+        a(href="#").btn.btn-social-network.btn-linkedin.text-uppercase.mr30
+          i.fa.fa-linkedin
+          |  import from linkedin
+        a(href="#").btn.btn-social-network.btn-google.text-uppercase
+          i.fa.fa-google-plus
+          |  import from Google
+    .row
+      .col-xl-12
+        .section-bg-line.m-b-0
+          h4.text-uppercase.m-b-0.d-inline-block
+            i.fa.fa-users
+            |  contacts
+          .col-xl-2.p-x-0.pull-right
+            .form-group.m-b-0
+            select.orderby.custom-select.w-100.form-control
+              option(value="0") SORTING BY
+    .row
+      .col-xl-12
+        table.table.table-bordered.m-b-0.filescroll
+          thead
+            tr.bgc-gray
+              th.w-input-big.text-xs-center
+                input(type="checkbox")
+              th.name Name
+              th.mail E-mail
+              th.source Source
+              th.w-input-big
+        .filescroll.m-t-0
+          .file-scroll.m-t-0
+            table.table.table-bordered.m-b-0
+              tbody
+                each lead in leads
+                  tr
+                    td.w-input.text-xs-center
+                      input(type="checkbox" name="id" value="1")
+                    td.name
+                      h4.m-y-0.text-uppercase #{ lead.first_name } #{ lead.last_name}
+                    td.mail
+                      span.mail #{ lead.email }
+                    td.source
+                      i.fa.fa-linkedin-square
+                      span LinkedIn
+                    td.w-input.text-xs-center
+                      .delete-section-container
+                        a(href="#").delete-sectionnew
+                          i.fa.fa-times
+                tr
+                  td.w-input.text-xs-center
+                    input(type="checkbox")
+                  td.name
+                    h4.m-y-0.text-uppercase david sparks
+                  td.mail
+                    span david@ukr.net
+                  td.source
+                    i.fa.fa-google-plus-square
+                    span Google+
+                  td.w-input.text-xs-center
+                    .delete-section-container
+                      a(href="#").delete-sectionnew
+                        i.fa.fa-times
+                tr
+                  td.w-input.text-xs-center
+                    input(type="checkbox")
+                  td.name
+                    h4.m-y-0.text-uppercase Robert Kim 
+                  td.mail
+                    span  webdeveloppro@gmail.com  
+                  td.source
+                    i.fa.fa-linkedin-square
+                    span LinkedIn
+                  td.w-input.text-xs-center
+                    .delete-section-container
+                      a(href="#").delete-sectionnew
+                        i.fa.fa-times
+                tr
+                  td.w-input.text-xs-center
+                    input(type="checkbox")
+                  td.name
+                    h4.m-y-0.text-uppercase vladislav tarasenko
+                  td.mail
+                    span webdeveloppro@gmail.com
+                  td.source
+                    i.fa.fa-google-plus-square
+                    span Google+
+                  td.w-input.text-xs-center
+                    .delete-section-container
+                      a(href="#").delete-sectionnew
+                        i.fa.fa-times
+                tr
+                  td.w-input.text-xs-center
+                    input(type="checkbox")
+                  td.name
+                    h4.m-y-0.text-uppercase david sparks
+                  td.mail
+                    span david@ukr.net
+                  td.source
+                    i.fa.fa-google-plus-square
+                    span Google+
+                  td.w-input.text-xs-center
+                    .delete-section-container
+                      a(href="#").delete-sectionnew
+                        i.fa.fa-times
+                tr
+                  td.w-input.text-xs-center
+                    input(type="checkbox")
+                  td.name
+                    h4.m-y-0.text-uppercase Robert Kim 
+                  td.mail
+                    span  webdeveloppro@gmail.com  
+                  td.source
+                    i.fa.fa-linkedin-square
+                    span LinkedIn
+                  td.w-input.text-xs-center
+                    .delete-section-container
+                      a(href="#").delete-sectionnew
+                        i.fa.fa-times
+                tr
+                  td.w-input.text-xs-center
+                    input(type="checkbox")
+                  td.name
+                    h4.m-y-0.text-uppercase vladislav tarasenko
+                  td.mail
+                    span webdeveloppro@gmail.com
+                  td.source
+                    i.fa.fa-google-plus-square
+                    span Google+
+                  td.w-input.text-xs-center
+                    .delete-section-container
+                      a(href="#").delete-sectionnew
+                        i.fa.fa-times
+
+        table.table.table-bordered.m-b-0
+          tbody.footer-table
+            tr.bgc-gray
+              td(colspan="5")
+                .pagination
+                  nav
+                    ul.pagination.pagination-sm
+                      li.page-item
+                        a(href="").page-link
+                          span(aria-hidden="true")
+                            i.fa.fa-angle-left
+                          span.sr-only <
+                      li.page-item.active
+                        a(href="#").page-link 2
+                      li.page-item
+                        a(href="#").page-link 3
+                      li.page-item
+                        a(href="").page-link
+                          span(aria-hidden="true")
+                            i.fa.fa-angle-right
+                          span.sr-only >
+    .row.mt30
+      .col-xl-12
+        .section-bg-line.m-b-0
+          h4.text-uppercase.m-b-0
+            i.fa.fa-paper-plane-o
+            |   send an E-mail
+        .panel-nav.bgc-gray
+          ul.d-inline-block.m-b-0
+            li
+              a(href="#")
+                i.fa.fa-bold
+            li
+              a(href="#")
+                i.fa.fa-italic
+            li
+              a(href="#")
+                i.fa.fa-underline
+            li.line |
+            li
+              a(href="#")
+                i.fa.fa-list-ol
+            li
+              a(href="#")
+                i.fa.fa-list-ul
+          .col-xl-2.p-x-0.pull-right.paste
+            .form-group.m-b-0
+              select.orderby.custom-select.w-100.form-control
+                option(selected) PASTE
+                option(value="1") Welcome Template 1
+                option(value="2") Welcome Template 2
+                option(value="3") Welcome Template 3
+                option(value="4") Campaign link
+
+        .messeg
+          .form-group.m-b-0
+            textarea.form-control
+          a(href="#").btn.btn-primary.m-t-2.pull-right submit
+    .row
+      .col-lg-12
+        .border-bottom.m-t-3.m-b-3
+
+
+
+
+
+
+
+
 
 section.grafic-dashboard
   div(style="display: none").container

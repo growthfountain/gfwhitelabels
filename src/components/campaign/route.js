@@ -64,14 +64,23 @@ module.exports = {
         ).done((companyFields, companyData) => {
 
           let model = new app.models.Company(companyData[0], companyFields[0]);
+          let metaDescription = companyData[0].tagline + '. ';
+          try {
+            metaDescription += companyData[0].description.split('.')[0];
+          } catch(e) {
+          }
+
           document.title = companyData[0].short_name || companyData[0].name;
-          document.head.querySelector('meta[name="description"]').content = companyData[0].tagline + '. ' + companyData[0].description.split('.')[0];
-          document.head.querySelector('meta[property="og:image"]').content = model.campaign.header_image_image_id.getUrl('main');
-          document.head.querySelector('link[rel="image_src"]').href = model.campaign.header_image_image_id.getUrl('main');
+          document.head.querySelector('meta[name="description"]').content = metaDescription;
+
+          document.head.querySelector('meta[property="og:title"]').content = companyData[0].short_name || companyData[0].name;
+          document.head.querySelector('meta[property="og:description"]').content = metaDescription;
+          document.head.querySelector('meta[property="og:image"]').content = model.campaign.getMainImage();
+          document.head.querySelector('meta[property="og:url"]').content = window.location.href;
           // document.head.querySelector('meta[name="keywords"]').content = companyData[0].tagline.replace(/ /g,',');
 
           let i = new View.detail({
-            model: model,
+            model: model
           });
           i.render();
           $('body').scrollTo();

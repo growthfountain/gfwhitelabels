@@ -769,9 +769,16 @@ module.exports = {
         ? Math.min(annualIncome, netWorth) * 0.1
         : Math.min(annualIncome, netWorth) * 0.05;
 
-      maxInvestmentsPerYear = maxInvestmentsPerYear < 2 ? 2 : maxInvestmentsPerYear;
+      maxInvestmentsPerYear = maxInvestmentsPerYear < 2 ? 2.2 : maxInvestmentsPerYear;
 
-      return Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
+      let result = Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
+
+      // Investor cannot invest more that 107000 in a year
+      if(result > 107000) {
+        result = 107000;
+      }
+
+      return result;
     },
 
     initMaxAllowedAmount() {
@@ -846,12 +853,16 @@ module.exports = {
     updatePerks(amount) {
       function updatePerkElements($elms, amount) {
         $elms.removeClass('active').find('i.fa.fa-check').hide();
-        $elms.each((idx, el) => {
-          if(parseInt(el.dataset.amount) <= amount) {
-            $(el).addClass('active').find('i.fa.fa-check').show();
-            return false;
-          }
+        let filteredPerks = _($elms).filter(el =>  {
+          const perkAmount = parseInt(el.dataset.amount);
+          return perkAmount <= amount;
         });
+
+        let activePerk = _.last(filteredPerks);
+
+        if (activePerk) {
+          $(activePerk).addClass('active').find('i.fa.fa-check').show();
+        }
       }
 
       updatePerkElements($('.invest-perks-mobile .perk'), amount);

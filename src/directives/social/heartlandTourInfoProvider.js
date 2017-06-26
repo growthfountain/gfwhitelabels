@@ -16,7 +16,7 @@ class HeartlandInfoProvider extends ShareInfoProvider {
     this.places = [
       'New York, New York',
       'Portland, Maine',
-      'Boston, Massachusetts',
+      'Boston / Worcester, Massachusetts',
       'Jacksonville, Florida',
       'Chattanooga, Tennessee',
       'Waterloo, Iowa',
@@ -43,14 +43,14 @@ class HeartlandInfoProvider extends ShareInfoProvider {
     this.data = {
       title: this._format('title'),
       url: window.location.href,
-      picture: window.location.origin + require('images/cities.png'),
+      picture: window.location.origin + require('images/banners/cities.png'),
     };
   }
 
   twitter() {
     return 'https://twitter.com/share' +
       '?url=' + this.data.url +
-      '&text=' + this._format('title') + '%0D%0A@GrowthFountain%0D%0A';
+      '&text=' + encodeURIComponent(this._format('title') + '\r\n@GrowthFountain\r\n');
   }
 
   linkedin() {
