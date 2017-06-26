@@ -631,6 +631,7 @@ module.exports = {
       this.campaign = options.campaign;
       this.formc = options.formc;
       this.leads = options.lead;
+      this.lead_count = options.lead_count
 
       //this is auth cookie for downloadable files
       app.cookies.set('token', app.user.data.token, {

@@ -178,7 +178,7 @@ module.exports = {
           api.makeCacheRequest(app.config.raiseCapitalServer + '/company/' + companyData.company_id + '?noi=1', 'GET'),
           app.user.getCampaignR(companyData.campaign_id),
           app.user.getFormcR(companyData.formc_id),
-          api.makeCacheRequest(app.config.authServer + '/import/linkedin', 'GET')
+          api.makeCacheRequest(app.config.authServer + '/import/linkedin?limit=15', 'GET')
         ).done((company, campaign, formc, lead) => {
 
           if(company[0]) app.user.company = company[0];
@@ -195,6 +195,7 @@ module.exports = {
             app.user.formc
           );
           params.lead = lead[0].data;
+          params.lead_count = lead[0].count;
 
           // FixMe
           // Temp fix for socialShare directive

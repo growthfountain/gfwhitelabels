@@ -180,90 +180,6 @@ section.dashboard-import
                       .delete-section-container
                         a(href="#").delete-sectionnew
                           i.fa.fa-times
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase david sparks
-                  td.mail
-                    span david@ukr.net
-                  td.source
-                    i.fa.fa-google-plus-square
-                    span Google+
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase Robert Kim 
-                  td.mail
-                    span  webdeveloppro@gmail.com  
-                  td.source
-                    i.fa.fa-linkedin-square
-                    span LinkedIn
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase vladislav tarasenko
-                  td.mail
-                    span webdeveloppro@gmail.com
-                  td.source
-                    i.fa.fa-google-plus-square
-                    span Google+
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase david sparks
-                  td.mail
-                    span david@ukr.net
-                  td.source
-                    i.fa.fa-google-plus-square
-                    span Google+
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase Robert Kim 
-                  td.mail
-                    span  webdeveloppro@gmail.com  
-                  td.source
-                    i.fa.fa-linkedin-square
-                    span LinkedIn
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase vladislav tarasenko
-                  td.mail
-                    span webdeveloppro@gmail.com
-                  td.source
-                    i.fa.fa-google-plus-square
-                    span Google+
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
 
         table.table.table-bordered.m-b-0
           tbody.footer-table
@@ -279,8 +195,9 @@ section.dashboard-import
                           span.sr-only <
                       li.page-item.active
                         a(href="#").page-link 2
-                      li.page-item
-                        a(href="#").page-link 3
+                      - for (var x = 2; x < (self.lead_count/15)-1; x++)
+                        li.page-item
+                          a(href="#").page-link #{ x }
                       li.page-item
                         a(href="").page-link
                           span(aria-hidden="true")
