@@ -131,6 +131,9 @@ section.dashboard-import
         p.text-justify Here you can import your contacts form LinkedIn and Google+. It allows you to make quick and convenient sending of the Emails right from this dashboard. Let`s people know about your campaign!
     .row.m-t-1.m-b-3
       .col-xl-12
+        form(enctype="multipart/form-data" action=app.config.authServer + '/import/linkedin')
+          input(type="file" name="file" id="linkedin_csv")
+          button(type="button" data-type="POST").importLinkedin import
         a(href="#").btn.btn-social-network.btn-linkedin.text-uppercase.mr30
           i.fa.fa-linkedin
           |  import from linkedin
@@ -162,20 +165,21 @@ section.dashboard-import
           .file-scroll.m-t-0
             table.table.table-bordered.m-b-0
               tbody
-                tr
-                  td.w-input.text-xs-center
-                    input(type="checkbox")
-                  td.name
-                    h4.m-y-0.text-uppercase Mariia kravchuk
-                  td.mail
-                    span.mail maria@gmail.com
-                  td.source
-                    i.fa.fa-linkedin-square
-                    span LinkedIn
-                  td.w-input.text-xs-center
-                    .delete-section-container
-                      a(href="#").delete-sectionnew
-                        i.fa.fa-times
+                each lead in leads
+                  tr
+                    td.w-input.text-xs-center
+                      input(type="checkbox" name="id" value="1")
+                    td.name
+                      h4.m-y-0.text-uppercase #{ lead.first_name } #{ lead.last_name}
+                    td.mail
+                      span.mail #{ lead.email }
+                    td.source
+                      i.fa.fa-linkedin-square
+                      span LinkedIn
+                    td.w-input.text-xs-center
+                      .delete-section-container
+                        a(href="#").delete-sectionnew
+                          i.fa.fa-times
                 tr
                   td.w-input.text-xs-center
                     input(type="checkbox")

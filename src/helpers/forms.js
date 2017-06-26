@@ -88,6 +88,7 @@ module.exports = {
     e.preventDefault();
 
     this.$el.find('.alert').remove();
+    debugger;
 
     let url = this.urlRoot || '';
     let method = e.target.dataset.method || 'POST';

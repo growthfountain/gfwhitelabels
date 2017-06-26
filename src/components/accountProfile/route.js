@@ -177,8 +177,9 @@ module.exports = {
         $.when(
           api.makeCacheRequest(app.config.raiseCapitalServer + '/company/' + companyData.company_id + '?noi=1', 'GET'),
           app.user.getCampaignR(companyData.campaign_id),
-          app.user.getFormcR(companyData.formc_id)
-        ).done((company, campaign, formc) => {
+          app.user.getFormcR(companyData.formc_id),
+          api.makeCacheRequest(app.config.authServer + '/import/linkedin', 'GET')
+        ).done((company, campaign, formc, lead) => {
 
           if(company[0]) app.user.company = company[0];
           if(campaign[0]) app.user.campaign = campaign[0];
@@ -193,6 +194,7 @@ module.exports = {
           params.formc = new app.models.Formc(
             app.user.formc
           );
+          params.lead = lead[0].data;
 
           // FixMe
           // Temp fix for socialShare directive

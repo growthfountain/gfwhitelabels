@@ -622,6 +622,7 @@ module.exports = {
     template: require('./templates/issuerDashboard.pug'),
     events: {
       'click .cancel-campaign': 'cancelCampaign',
+      'click .importLinkedin': 'importLinkedin',
     },
 
     initialize(options) {
@@ -629,6 +630,7 @@ module.exports = {
       this.model = this.company;
       this.campaign = options.campaign;
       this.formc = options.formc;
+      this.leads = options.lead;
 
       //this is auth cookie for downloadable files
       app.cookies.set('token', app.user.data.token, {
@@ -645,6 +647,7 @@ module.exports = {
           company: this.company,
           campaign: this.campaign,
           formc: this.formc,
+          leads: this.leads,
         })
       );
 
@@ -661,6 +664,23 @@ module.exports = {
     cancelCampaign(e) {
       e.preventDefault();
       app.dialogs.info('Please, call us 646-759-8228');
+    },
+
+    importLinkedin(e) {
+      var formData = new FormData();
+      var linkedinCsv = document.getElementById('linkedin_csv');
+      formData.append("file", linkedinCsv.files[0]);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", app.config.authServer + '/import/linkedin');
+      xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+      xhr.onreadystatechange = function () {
+        if(xhr.readyState === XMLHttpRequest.DONE) {
+          console.log('status ', xhr.status);
+          let data = JSON.parse(xhr.responseText);
+          console.log(xhr.responseText);
+        }
+      };
+      xhr.send(formData);
     },
 
     initComments() {
