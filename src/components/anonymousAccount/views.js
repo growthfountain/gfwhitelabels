@@ -33,15 +33,15 @@ module.exports = {
     },
 
     render() {
+      // clear previous modal elements from DOM
+      $('#sign_in').remove();
+      $('#sign_up').remove();
+
       $('body').scrollTo();
 
       this.$el.html(
         this.template()
       );
-
-      // clear previous modal elements from DOM
-      $('#sign_in').remove();
-      $('#sign_up').remove();
 
       $('body').append(this.$el);
 
@@ -134,6 +134,19 @@ module.exports = {
     },
 
     initialize(options) {
+      this.fields = {
+        email: {
+          required: true,
+          type: 'email',
+        },
+        password: {
+          required: true,
+          type: 'password',
+          minLength: 8,
+          //needed for validation message
+          label: 'Password',
+        }
+      };
     },
 
     render() {
