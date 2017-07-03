@@ -17,6 +17,7 @@ module.exports = {
     },
     initialize(options) {
       options.collection.data = options.collection.data.map(companyData => new app.models.Company(companyData));
+      options.collection.data = options.collection.data.filter(companyData => !companyData.campaign.expired);
       this.collection = options.collection;
     },
 
@@ -303,6 +304,13 @@ module.exports = {
     },
 
     render() {
+      if (this.model.campaign.expired) {
+        const template = require('templates/errorPage.pug');
+        this.$el.html(template());
+        app.hideLoading();
+        return this;
+      }
+
       this.$el.html(
         this.template({
           values: this.model,
@@ -769,8 +777,8 @@ module.exports = {
       maxInvestmentsPerYear = maxInvestmentsPerYear < 2 ? 2.2 : maxInvestmentsPerYear;
 
       // Investor cannot invest more that 107000 in a year
-      if(maxInvestmentsPerYear > 107000) {
-        maxInvestmentsPerYear = 107000;
+      if(maxInvestmentsPerYear > 107) {
+        maxInvestmentsPerYear = 107;
       }
 
       let result = Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
