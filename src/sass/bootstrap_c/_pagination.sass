@@ -24,19 +24,20 @@
     &:hover a
       border: 1px solid #a3a3a3
       color: $grey
-      background: $white
+      background: none
       +mt(0.2s)
 
   .page-item a:visited,
   .page-item a:focus
     text-decoration: none
-    background: $white
+    background: none
   
   .page-item.active a,
   .page-item.active a:focus,
   .page-item.active a:visited
-    background: $white
+    background: $active-pagination-bgc
+    border-color: $active-pagination-bgc
     font-weight: bold
 
     &:hover
-      background: $white
+      background: $active-pagination-bgc
