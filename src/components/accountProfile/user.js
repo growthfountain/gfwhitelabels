@@ -98,7 +98,7 @@ class User {
 
     this.next = null;
 
-    if(data.hasOwnProperty('token')) {
+    if(data.token) {
       let a = '';
       if(data.hasOwnProperty('info') == false) {
         a = api.makeRequest(app.config.authServer + '/info',  'GET'); //.done(() => {
