@@ -255,11 +255,17 @@ class FileDropzone {
       });
     });
 
+    dropzone.on('sending', (file, formData, xhr) => {
+      console.log('sending ', file, formData, xhr);
+    });
+
     dropbox.on('success', (file, data) => {
+      console.log('success ', file, data);
       this.success(file, data);
     });
 
     dropbox.on('error', (file, error, xhr) => {
+      console.log('error ', file, error);
       $(this.element).find('.uploading').hide().addClass('collapse').css('z-index', '');
       app.validation.invalidMsg(
         this.view,
