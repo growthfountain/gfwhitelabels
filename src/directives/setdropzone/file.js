@@ -259,7 +259,7 @@ class FileDropzone {
       console.log('file added ', file);
     });
 
-    dropzone.on('sending', (file, formData, xhr) => {
+    dropbox.on('sending', (file, formData, xhr) => {
       console.log('sending ', file, formData, xhr);
     });
 
