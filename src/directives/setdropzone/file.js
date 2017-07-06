@@ -255,6 +255,10 @@ class FileDropzone {
       });
     });
 
+    dropbox.on('addedfiles', (file) => {
+      console.log('file added ', file);
+    });
+
     dropzone.on('sending', (file, formData, xhr) => {
       console.log('sending ', file, formData, xhr);
     });
