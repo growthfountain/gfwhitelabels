@@ -55,6 +55,9 @@ $.serializeJSON.defaultOptions = _.extend($.serializeJSON.defaultOptions, {
     decimal(val) {
       return app.helpers.format.unformatPrice(val);
     },
+    percent(val) {
+      return app.helpers.format.unformatPercent(val);
+    },
     money(val) {
       return app.helpers.format.unformatPrice(val);
     },
@@ -78,3 +81,5 @@ $.serializeJSON.defaultOptions = _.extend($.serializeJSON.defaultOptions, {
   parseNulls: true,
   parseNumbers: true
 });
+
+global.testHelpers = require('./testHelpers.js');
