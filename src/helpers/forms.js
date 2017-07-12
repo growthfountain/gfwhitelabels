@@ -182,9 +182,8 @@ module.exports = {
       return false;
     } else {
 
-      api.makeRequest(url, method, newData).
-        then((responseData) => {
-
+      api.makeRequest(url, method, newData)
+        .then((responseData) => {
           // ToDo
           // Do we really need this ?!
           if(method != 'POST') {
@@ -216,8 +215,8 @@ module.exports = {
               { trigger: true, replace: false }
             );
           }
-        }).
-        fail((xhr, status, text) => {
+        })
+        .catch((xhr, status, text) => {
           if(form.length > 0) {
             form[0].removeAttribute('disabled');
           }
