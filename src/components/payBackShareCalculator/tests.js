@@ -1,8 +1,3 @@
-const chai     = require('chai');
-const { expect } = chai;
-const sinon    = require('sinon');
-const request  = require('request');
-
 const calculator = require('./calculator.js');
 const Views = require('./views.js');
 

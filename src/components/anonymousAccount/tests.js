@@ -1,8 +1,3 @@
-const chai      = require('chai');
-const sinon     = require('sinon');
-const should    = chai.should();
-const expect    = chai.expect;
-
 const Views = require('src/components/anonymousAccount/views.js');
 const eventEmitter = _.extend({}, Backbone.Events);
 

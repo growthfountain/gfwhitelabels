@@ -47,3 +47,8 @@ const Router = require('src/router.js');
 app.routers = new Router();
 
 global.testHelpers = require('./testHelpers.js');
+
+global.chai      = require('chai');
+global.sinon     = require('sinon');
+global.should    = chai.should();
+global.expect    = chai.expect;
