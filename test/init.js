@@ -12,6 +12,7 @@ if (require.extensions) {
   }
 }
 
+global.require = require;
 const { LocalStorage } = require('node-localstorage');
 const { JSDOM } = require('jsdom');
 

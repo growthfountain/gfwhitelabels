@@ -7,6 +7,23 @@ const validation = require('components/validation/validation.js');
 
 const CalculatorView = require('./revenueShareCalculator.js');
 
+const AMOUNT_VALIDATION_ENUM = {
+  VALID: 0,
+  LT_MIN: 1,
+  GT_MAX: 2,
+};
+
+const validateAmount = (amount, min, max) => {
+  amount = Number(amount);
+
+  if (amount < min)
+    return AMOUNT_VALIDATION_ENUM.LT_MIN;
+
+  if (amount > max)
+    return AMOUNT_VALIDATION_ENUM.GT_MAX;
+
+  return AMOUNT_VALIDATION_ENUM.VALID;
+};
 
 module.exports = {
   list: Backbone.View.extend({
@@ -483,7 +500,6 @@ module.exports = {
       };
       */
 
-
       this.fields.signature = {
         type: 'nested',
         requiredTemp: true,
@@ -493,34 +509,32 @@ module.exports = {
         required: true,
       };
 
-      const validateAmount = (amount) => {
-        amount = Number(amount);
-        let min = this.model.campaign.minimum_increment;
-        let max = this._maxAllowedAmount;
-        let validationMessage = '';
+      const validateAmountWithErrorMessage = (amount) => {
+        const res = validateAmount(amount,
+          this.model.campaign.minimum_increment,
+          this._maxAllowedAmount);
 
-        if (amount < min) {
-          validationMessage = 'Sorry, minimum investment is $' + min;
-        }
+        if (res === AMOUNT_VALIDATION_ENUM.VALID)
+          return true;
 
-        if (amount > max) {
-          validationMessage = 'Sorry, your amount is too high, please update your income or change amount';
-        }
+        setTimeout(() => {
+          this.$amount.popover('show');
+          this.$amount.scrollTo(200);
+        }, 700);
 
-        if (validationMessage) {
-          setTimeout(() => {
-            this.$amount.popover('show');
-            this.$amount.scrollTo(200);
-          }, 700);
-          throw validationMessage;
-        }
+        if (res === AMOUNT_VALIDATION_ENUM.LT_MIN)
+          throw `Sorry, minimum investment is $${this.model.campaign.minimum_increment}`;
+
+        if (res === AMOUNT_VALIDATION_ENUM.GT_MAX)
+          throw 'Sorry, your amount is too high, please update your income or change amount';
 
         return true;
       };
 
       this.fields.amount.fn = function(name, value, attr, data, computed) {
-        return validateAmount(value);
+        return validateAmountWithErrorMessage(value);
       };
+
       this.fields.amount.positiveOnly = true;
 
       this.model.campaign.expiration_date = new Date(this.model.campaign.expiration_date);
@@ -755,22 +769,22 @@ module.exports = {
     },
 
     validateAmount(amount) {
-      amount = Number(amount);
-      let min = this.model.campaign.minimum_increment;
-      let max = this._maxAllowedAmount;
-      if (amount < min) {
+      const res = validateAmount(Number(amount),
+        this.model.campaign.minimum_increment,
+        this._maxAllowedAmount);
+
+      if (res === AMOUNT_VALIDATION_ENUM.LT_MIN) {
         this.updateAmountPopover('minimum-increment', true);
         return false;
       }
 
-      if (amount > max) {
+      if (res === AMOUNT_VALIDATION_ENUM.GT_MAX) {
         this.updateAmountPopover('amount-campaign', true);
         $('.popover a.update-income-worth')
           .off('click')
-          .on('click', (e) => {
+          .on('click', () => {
             this.$amount.popover('hide');
           });
-
         return false;
       }
 
