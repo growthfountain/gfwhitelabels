@@ -1,3 +1,4 @@
+const moment = require('moment');
 const Views = require('./views.js');
 const companyFees = require('consts/companyFees.json');
 
@@ -646,6 +647,7 @@ describe('Investment page', () => {
   });
 
   beforeEach(() => {
+    testHelpers.stubMakeRequest({});
     app.emitCompanyAnalyticsEvent = sinon.stub(app, 'emitCompanyAnalyticsEvent');
     const companyData = JSON.parse(JSON.stringify(mocks.company.data));
     inst.View = new Views.investment({
@@ -661,36 +663,7 @@ describe('Investment page', () => {
     $('#content').empty();
     delete inst.View;
     app.emitCompanyAnalyticsEvent.restore();
-  });
-  //
-  // describe('calcFeeWithCredit', () => {
-  //   // it('credit > 0');
-  //   // it('credit <= 0');
-  //   // it('credit > fee');
-  //   // it('credit === fee');
-  //   // it('credit < fee');
-  // });
-
-  it('calcFeeWithCredit', () => {
-    //credit <= 0
-    //credit > 0
-
-  });
-
-  it('validateAmount', () => {
-
-  });
-
-  it('maxInvestmentsPerYear', () => {
-
-  });
-
-  it('initMaxAllowedAmount', () => {
-
-  });
-
-  it('render with expired/not expired', () => {
-
+    api.makeRequest.restore();
   });
 
   it('emitCompanyAnalyticsEvent', () => {
@@ -698,37 +671,180 @@ describe('Investment page', () => {
     expect(app.emitCompanyAnalyticsEvent.args[0][0]).to.equal(mocks.company.data.ga_id);
   });
 
-  it('function validation message',() =>{
-    // Validation for amount
-    // Создал класс
-    // this.fields.amount.validation.fn - проверяем значения
+  describe('calcFeeWithCredit', () => {
+    it('credit > fee', () => {
+      inst.View.user.credit = 15;
+      const res = inst.View.calcFeeWithCredit();
+      expect(res).to.deep.equal({
+        waived: companyFees.fees_to_investor,
+        fee: 0,
+        remainingCredit: 5,
+        credit: 15,
+      });
+    });
+
+    it('credit <= 0', () => {
+      inst.View.user.credit = 0;
+      const res = inst.View.calcFeeWithCredit();
+      expect(res).to.deep.equal({
+        waived: 0,
+        fee: companyFees.fees_to_investor,
+        remainingCredit: 0,
+        credit: 0,
+      });
+    });
+
+    it('credit === fee', () => {
+      inst.View.user.credit = companyFees.fees_to_investor;
+      const res = inst.View.calcFeeWithCredit();
+      expect(res).to.deep.equal({
+        waived: companyFees.fees_to_investor,
+        fee: 0,
+        remainingCredit: 0,
+        credit: companyFees.fees_to_investor,
+      });
+    });
+
+    it('credit < fee', () => {
+      inst.View.user.credit = companyFees.fees_to_investor - Math.round(companyFees.fees_to_investor / 2);
+      const res = inst.View.calcFeeWithCredit();
+      expect(res).to.deep.equal({
+        waived: companyFees.fees_to_investor,
+        fee: companyFees.fees_to_investor - inst.View.user.credit,
+        remainingCredit: 0,
+        credit: inst.View.user.credit,
+      });
+    });
   });
 
-  it('разработься с triggerAmountChange',()  => {
+  it('initMaxAllowedAmount positive', () => {
+    const user = inst.View.user;
+    user.annual_income = 110;
+    user.net_worth = 100;
+    user.invested_on_other_sites = 1000;
+    user.invested_equity_past_year = 5000;
+
+    inst.View.initMaxAllowedAmount();
+    expect(inst.View._maxAllowedAmount).to.equal(4000);
+  });
+
+  it('initMaxAllowedAmount zero', () => {
+    const user = inst.View.user;
+    user.annual_income = 110;
+    user.net_worth = 10;
+    user.invested_on_other_sites = 1000;
+    user.invested_equity_past_year = 5000;
+
+    inst.View.initMaxAllowedAmount();
+    expect(inst.View._maxAllowedAmount).to.equal(0);
+  });
+
+  it('validateAmount: amount valid', () => {
+    const user = inst.View.user;
+    user.annual_income = 110;
+    user.net_worth = 100;
+    user.invested_on_other_sites = 1000;
+    user.invested_equity_past_year = 5000;
+
+    inst.View.initMaxAllowedAmount();
+    expect(inst.View.validateAmount(2000)).to.equal(true);
+  });
+
+  it('validateAmount: amount invalid', () => {
+    const user = inst.View.user;
+    user.annual_income = 110;
+    user.net_worth = 100;
+    user.invested_on_other_sites = 1000;
+    user.invested_equity_past_year = 5000;
+
+    inst.View.initMaxAllowedAmount();
+    expect(inst.View.validateAmount(5000)).to.equal(false);
+  });
+
+  describe('render', () => {
+
+    it('expired campaign', () => {
+      inst.View.model.campaign.data.expiration_date = moment().subtract(1, 'years').format('YYYY-MM-DD');
+      inst.View.render();
+      expect(inst.View.$el.find('img[alt="campaign expired"]').length).to.equal(1);
+    });
+
+    it('active campaign', () => {
+      inst.View.model.campaign.data.expiration_date = moment().add(1, 'years').format('YYYY-MM-DD');
+      inst.View.render();
+      expect(inst.View.$el.find('#investForm').length).to.equal(1);
+    });
 
   });
 
-  it('maxInvestmentsPerYear', () => {
-    // передать разные данные и проверить возвращаемые значения
+  it('function validation message', () => {
+    const min = 100;
+    const max = 5000;
+    inst.View.model.campaign.minimum_increment = min;
+    inst.View._maxAllowedAmount = max;
+
+    const validateMin = () => {
+      return inst.View.fields.amount.fn('amount', 99);
+    };
+
+    const validateMax = () => {
+      return inst.View.fields.amount.fn('amount', 50001);
+    };
+
+    const validateOK = () => {
+      return inst.View.fields.amount.fn('amount', 2000);
+    };
+
+    expect(validateMin).to.throw('Sorry, minimum investment is $' + min);
+    expect(validateMax).to.throw('Sorry, your amount is too high, please update your income or change amount');
+    expect(validateOK()).to.equal(true);
   });
 
   it('roundAmount', () => {
-    // проверить разные значения
+    const amount = 1000;
+    const formattedAmount = app.helpers.format.formatMoney(amount);
+    const $amount = inst.View.$('#amount');
+
+    $amount.val(amount).trigger('keyup');
+
+    inst.View.model.security_type = 1;
+    $amount.trigger('change');
+    expect($amount.val()).to.equal(formattedAmount);
+
+    inst.View.model.security_type = 0;
+    inst.View.model.campaign.price_per_share = 2.75;
+
+    $amount.trigger('change');
+    expect($amount.val()).to.equal(app.helpers.format.formatMoney(1001));
   });
 
-  it('updateLimitInModal и updateIncomeWorth', () => {
-    // переписать фукнции
-    // app.formats.money(this.$('#annual_income').val()) ?
+  it('updateIncomeWorth', () => {
+    const annual_income = 110000;
+    const net_worth = 100000;
+
+    inst.View.user.invested_on_other_sites = 1000;
+    inst.View.user.invested_equity_past_year = 5000;
+
+    inst.View.$('#annual_income').val(annual_income).trigger('keyup');
+    inst.View.$('#net_worth').val(net_worth).trigger('keyup');
+
   });
 
-  it('getSignature', () => {
-    // сделать одну строчку return document.querySelector('[name="signature[full_name]"]').value,
-    //   куки перенести в initialize
+  it('разработься с triggerAmountChange', () => {
+
   });
 
+  it('updateIncomeWorth', () => {
+    const annual_income = 110000;
+    const net_worth = 100000;
 
-  it('copyToSignature', () => {
-    // выкинуть или сделать одной строчкой
+    inst.View.user.invested_on_other_sites = 1000;
+    inst.View.user.invested_equity_past_year = 5000;
+
+    inst.View.$('#annual_income').val(annual_income).trigger('keyup');
+    inst.View.$('#net_worth').val(net_worth).trigger('keyup');
+
+    //TODO: implement
   });
 
   it('submit', () => {

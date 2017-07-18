@@ -9,13 +9,6 @@ app.user.setData = function(...args) {
   });
 };
 
-const stubMakeRequest = (response) => {
-  api.makeRequest = sinon.stub(api, 'makeRequest');
-  const dfr = $.Deferred();
-  dfr.resolve(response);
-  api.makeRequest.returns(dfr);
-};
-
 const readUserData = () => {
   return {
     user: JSON.parse(localStorage.getItem('user')),
@@ -54,7 +47,7 @@ describe('Log-in page', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeLoginResponse);
+    testHelpers.stubMakeRequest(fakeLoginResponse);
     inst.LoginView = new Views.login({
       el: '#content',
       model: {}
@@ -143,7 +136,7 @@ describe('Sign-up page', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeLoginResponse);
+    testHelpers.stubMakeRequest(fakeLoginResponse);
 
     inst.SignupView = new Views.signup({
       el: '#content',
@@ -220,7 +213,7 @@ describe('Sign-up popup', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeSignupResponse);
+    testHelpers.stubMakeRequest(fakeSignupResponse);
     inst.SignupPopup = new Views.popupSignup();
     inst.SignupPopup.render();
   });
@@ -309,7 +302,7 @@ describe('Log-in popup', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeLoginResponse);
+    testHelpers.stubMakeRequest(fakeLoginResponse);
     inst.SignupPopup = new Views.popupLogin({});
     inst.SignupPopup.render();
   });

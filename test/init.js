@@ -9,7 +9,10 @@ if (require.extensions) {
       globals: ['require', 'app'],
     });
     module.exports = template
-  }
+  };
+  require.extensions['.png'] = function compile(module, filename) {
+    module.exports = filename;
+  };
 }
 
 global.require = require;
@@ -21,19 +24,32 @@ global.window = (new JSDOM('<body><div id="page"><div id="content"></div></div><
   url: 'https://alpha.growthfountain.com'
 })).window;
 
-global.document = window.document;
 global.window.localStorage = global.localStorage;
+global._ = require('underscore');
+
 window.__defineSetter__('location', (val) => {});
-global.location = window.location;
+
+_.extend(global, _.pick(window, [
+  'document',
+  'pageYOffset',
+  'pageXOffset',
+  'location',
+  'getComputedStyle',
+  'Element',
+  'HTMLInputElement',
+  'Node',
+  'innerHeight',
+  'innerWidth',
+]));
+
+HTMLInputElement.prototype.setSelectionRange = () => {};
+
 global.navigator = { userAgent: 'node.js' };
 global.$ = global.jQuery = require('jquery');
-global._ = require('underscore');
+
 global.Backbone = require('backbone');
 global.Tether = window.Tether = require('tether');
 require('bootstrap');
-global.Element = window.Element;
-global.Node = window.Node;
-
 require('babel-polyfill');
 require('jquery-serializejson');
 require('js/html5-dataset.js');

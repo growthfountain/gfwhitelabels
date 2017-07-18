@@ -644,6 +644,11 @@ module.exports = {
 
       if (this.model.ga_id)
         app.emitCompanyAnalyticsEvent(this.model.ga_id);
+
+      app.cookies.set('token', app.user.token, {
+        domain: '.' + app.config.domainUrl,
+        path: '/',
+      });
     },
 
     render() {
@@ -707,7 +712,7 @@ module.exports = {
         return {
           waived: 0,
           fee: fee,
-          remainCredit: 0,
+          remainingCredit: 0,
           credit: 0,
         };
 
@@ -803,7 +808,11 @@ module.exports = {
       if (maxInvestmentsPerYear > 107)
         maxInvestmentsPerYear = 107;
 
-      return Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
+      let allowedAmount = Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
+      if (allowedAmount< 0)
+        allowedAmount = 0;
+
+      return allowedAmount;
     },
 
     initMaxAllowedAmount() {
@@ -816,14 +825,6 @@ module.exports = {
         investedPastYear, investedOnOtherSites);
     },
 
-    getNumber(value) {
-      return Number(value.replace(/[\$,]/g, ''));
-    },
-
-    formatNumber(value) {
-      return value.toLocaleString('en-US');
-    },
-
     roundAmount(e) {
       // e.preventDefault();
 
@@ -831,7 +832,7 @@ module.exports = {
       if (this.model.campaign.security_type == 1)
         return;
 
-      let amount = this.getNumber(e.target.value);
+      let amount = app.helpers.format.unformatMoney(e.target.value);
       if (!amount)
         return;
 
@@ -844,7 +845,7 @@ module.exports = {
 
       let newAmount = Math.ceil(amount / pricePerShare) *  pricePerShare;
 
-      this.$amount.val('$' + this.formatNumber(newAmount));
+      this.$amount.val(app.helpers.format.formatMoney(newAmount));
       this._updateTotalAmount();
 
       if (newAmount > amount) {
@@ -860,7 +861,7 @@ module.exports = {
 
       app.helpers.format.formatMoneyInputOnKeyup(e);
 
-      let amount = this.getNumber(e.target.value);
+      let amount = app.helpers.format.unformatMoney(e.target.value);
       if (!amount)
         return;
 
@@ -897,8 +898,8 @@ module.exports = {
     _updateTotalAmount() {
       const feeInfo = this.calcFeeWithCredit();
 
-      let totalAmount = this.getNumber(this.$amount.val()) + feeInfo.fee;
-      let formattedTotalAmount = '$' + this.formatNumber(totalAmount)
+      let totalAmount = app.helpers.format.unformatMoney(this.$amount.val()) + feeInfo.fee;
+      let formattedTotalAmount = app.helpers.format.formatMoney(totalAmount)
       this.$el.find('.total-investment-amount').text(formattedTotalAmount);
       this.$el.find('[name=total_amount]').val(formattedTotalAmount);
 
@@ -916,41 +917,28 @@ module.exports = {
       e.stopPropagation();
 
       app.helpers.format.formatMoneyInputOnKeyup(e);
-      const rx = /[\$,]/g;
 
-      let annualIncome = Number(this.$('#annual_income').val().replace(rx, ''));
-      let netWorth = Number(this.$('#net_worth').val().replace(rx, '')) || 0;
-      if (isNaN(annualIncome) || !annualIncome)
-        annualIncome = 0;
-      if (isNaN(netWorth) || !netWorth)
-        netWorth = 0;
-
-      let investedOnOtherSites = this.user.invested_on_other_sites;
-      let investedPastYear = this.user.invested_equity_past_year;
+      const annualIncome = app.helpers.format.unformatMoney(this.$('#annual_income').val()) || 0;
+      const netWorth = app.helpers.format.unformatMoney(this.$('#net_worth').val()) || 0;
 
       this.$('span.current-limit').text(
-        this.maxInvestmentsPerYear(annualIncome / 1000, netWorth / 1000, investedPastYear, investedOnOtherSites)
-          .toLocaleString('en-US')
+        this.maxInvestmentsPerYear(
+          annualIncome / 1000,
+          netWorth / 1000,
+          this.user.invested_equity_past_year,
+          this.user.invested_on_other_sites
+        ).toLocaleString('en-US')
       );
-
       return false;
     },
 
     updateIncomeWorth(e) {
-      const rx = /[\$,]/g;
-      let netWorth = $('#net_worth')
-        .val()
-        .trim()
-        .replace(rx, '') / 1000;
-
-      let annualIncome = $('#annual_income')
-        .val()
-        .trim()
-        .replace(rx, '') / 1000;
+      const $netWorth = $('#net_worth');
+      const $annualIncome = $('#annual_income');
 
       let data = {
-        net_worth: netWorth,
-        annual_income: annualIncome
+        net_worth: (app.helpers.format.unformatMoney($netWorth.val()) || 0) / 1000,
+        annual_income: (app.helpers.format.unformatMoney($annualIncome.val()) || 0) / 1000,
       };
 
       const validateRange = (value, min=0, max, prefix) => {
@@ -987,8 +975,8 @@ module.exports = {
       }
 
       api.makeRequest(app.config.authServer + '/rest-auth/data', 'PATCH', data).done((data) => {
-        this.user.net_worth = netWorth;
-        this.user.annual_income = annualIncome;
+        this.user.net_worth = data.net_worth;
+        this.user.annual_income = data.annual_income;
 
         this.initMaxAllowedAmount();
         $('span.current-limit').text(this._maxAllowedAmount.toLocaleString('en-US'));
@@ -1003,21 +991,8 @@ module.exports = {
       });
     },
 
-    getSignature () {
-
-      app.cookies.set('token', app.user.token, {
-        domain: '.' + app.config.domainUrl,
-        path: '/',
-      });
-
-      const investForm = document.forms.invest_form;
-      const inputSignature = investForm.elements['signature[full_name]'];
-      const signature = inputSignature.value;
-      return signature;
-    },
-
     copyToSignature(e) {
-      const signature = this.getSignature();
+      const signature = $(e.target).closest('input').val();
       this.$('.signature').text(signature);
     },
 
@@ -1166,7 +1141,7 @@ module.exports = {
 
       return {
         compaign_id: this.model.id,
-        signature: this.getSignature(),
+        signature: formData.signature.full_name,
 
         fees_to_investor: companyFees.fees_to_investor,
         trans_percent: companyFees.trans_percent,
