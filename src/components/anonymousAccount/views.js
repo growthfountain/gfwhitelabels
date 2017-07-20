@@ -1,3 +1,5 @@
+const View = require('view.ts');
+
 const socialAuth = require('./social-auth.js');
 
 const LOGIN_FIELDS = {

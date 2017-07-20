@@ -86,17 +86,12 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['env'],
-          },
-        },
-        include: [path.resolve(__dirname, 'src')],
-        exclude: [/\/node_modules\//],
+			// All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+      { 
+        test: /\.tsx?$/,
+        loader: "awesome-typescript-loader" 
       },
+      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
       {
         test: /\.css$/,
         include: [
