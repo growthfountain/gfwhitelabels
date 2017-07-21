@@ -1,4 +1,4 @@
-const View = require('view.ts');
+const coreViews = require('core/views.ts');
 
 const socialAuth = require('./social-auth.js');
 
@@ -114,6 +114,14 @@ const popupAuthHelper = {
     },
   },
 };
+
+
+/*
+class Login extends coreViews.FormView {
+  template = require('./templates/login.pug');
+  model = app.user;
+}
+*/
 
 const Views = {
   popupLogin: Backbone.View.extend(_.extend({

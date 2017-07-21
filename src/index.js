@@ -9,7 +9,6 @@ global.onYouTubeIframeAPIReady = () => {
 
 $(document).ready(function() {
   require('./eventHandlers.js');
-  const App = require('app.js');
-  global.app = new App();
+  global.app = require('app.js')();
   app.start();
 });
