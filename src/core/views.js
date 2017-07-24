@@ -1,7 +1,8 @@
+import * as $ from "jquery";
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 class View {
-    constructor(model = {}, selector = "#content", directives = [], events = {}, ...args) {
-        this.model = {};
+    constructor(model = null, selector = "#content", directives = [], events = {}, ...args) {
+        this.model = null;
         this.el = null;
         this.template = null; // set to function type
         this.events = {};
@@ -68,19 +69,21 @@ class FormView extends View {
         if (newData === null) {
             newData = form.closest('form').serializeJSON();
         }
+        /*
         // issue 348, disable form for double posting
-        if (form.length > 0) {
-            form[0].setAttribute('disabled', true);
+        if(form.length > 0) {
+          form[0].setAttribute('disabled', true);
         }
         e.target.setAttribute('disabled', true);
+         */
         let errors = this.model.setData(newData);
-        if (Object.keys(errors) !== 0) {
+        if (Object.keys(errors).length !== 0) {
             for (let key in errors) {
                 let messages = errors[key];
                 this.errorMsg(this, key, messages);
             }
             ;
-            this.$('.help-block').prev().scrollTo(25);
+            this.find('.help-block').prev().scrollTo(25);
             if (form.length > 0) {
                 form[0].removeAttribute('disabled');
             }
@@ -117,7 +120,7 @@ class FormView extends View {
     _success(data) {
         return true;
     }
-    clearErrorMsgs(attr, selector) {
+    clearErrorMsgs() {
         this.find('.alert').remove();
         this.find('.has-error').removeClass('has-error');
         this.find('.help-block').remove();

@@ -84,14 +84,19 @@ module.exports = {
     publicPath: '/',
     pathinfo: !isProd,
   },
+  // target: 'node',
   module: {
     rules: [
 			// All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
       { 
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader" 
+        loader: "awesome-typescript-loader",
       },
-      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
+      { 
+        test: /\.js$/,
+        loader: "source-map-loader",
+        enforce: "pre",
+      },
       {
         test: /\.css$/,
         include: [

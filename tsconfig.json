@@ -1,17 +1,19 @@
 {
 	"compilerOptions": {
         "lib": [
-            "es2015",
+            "es2016",
             "dom"
         ],
         "outDir": "./dist/",
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "commonjs",
-        "target": "es5",
-        "jsx": "react"
+        "target": "es5"
     },
     "include": [
         "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
     ]
 }

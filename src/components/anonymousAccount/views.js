@@ -1,6 +1,11 @@
+const socialAuth = require('./social-auth.js');
 const coreViews = require('core/views.ts');
 
-const socialAuth = require('./social-auth.js');
+debugger;
+let loginView = new coreViews.default.FormView(app.user);
+loginView._success = (data) => { app.user.setData(data); };
+loginView.template = require('./templates/login.pug');
+
 
 const LOGIN_FIELDS = {
   email: {
@@ -116,12 +121,6 @@ const popupAuthHelper = {
 };
 
 
-/*
-class Login extends coreViews.FormView {
-  template = require('./templates/login.pug');
-  model = app.user;
-}
-*/
 
 const Views = {
   popupLogin: Backbone.View.extend(_.extend({
@@ -175,7 +174,8 @@ const Views = {
     popupAuthHelper.methods
   )),
 
-  login: Backbone.View.extend({
+  login: loginView,
+  /*
     urlRoot: app.config.authServer + '/rest-auth/login',
     template: require('./templates/login.pug'),
     events: {
@@ -198,8 +198,8 @@ const Views = {
     _success(data) {
       app.user.setData(data);
     },
-
   }),
+  */
 
   signup: Backbone.View.extend({
     urlRoot: `${app.config.authServer}/rest-auth/registration`,

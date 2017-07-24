@@ -1,14 +1,34 @@
+import Model from "./models";
+import * as $ from "jquery";
+
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
+var app = {
+  showLoading: function(){},
+  routers: {
+    navigate: function(a:any, b:any){},
+  }
+};
+
+declare global {
+  interface JQuery {
+
+    /**
+     * Serializes the selected form into JSON.
+     */
+    serializeJSON(): Object;
+    scrollTo(): void;
+  }
+}
 
 class View {
 
-  protected model = {};
+  protected model:Model = null;
   protected el:Element = null;
-  protected template:any = null; // set to function type
+  public template:any = null; // set to function type
   protected events = {};
   protected directives:any = [];
 
-  constructor(model={}, selector="#content", directives:any=[], events={}, ...args:any[]) {
+  constructor(model:Model=null, events={}, directives:any=[], selector="#content", ...args:any[]) {
     this.el = document.querySelector(selector);
 
     this.model = model;
@@ -72,13 +92,16 @@ class View {
 }
 
 class FormView extends View {
-  constructor(template:any, model=null, selector="#content", directives:any=[], events={}, ...args:any[]) {
+
+  constructor(model:Model=null, events:any={}, directives:any=[], selector:string="#content", ...args:any[]) {
 
     if (model === null) {
       throw 'Please provide model for FormView';
     }
 
-    super(template, model, selector, directives, events, ...args);
+    debugger;
+    events['submit form'] = 'submit';
+    super(model, events, directives, selector, ...args);
   }
 
   submit(e:Event, newData:any=null) {
@@ -91,40 +114,41 @@ class FormView extends View {
       newData = form.closest('form').serializeJSON();
     }
 
+    /* 
+     *
     // issue 348, disable form for double posting
     if(form.length > 0) {
       form[0].setAttribute('disabled', true);
     }
-    e.target.setAttribute('disabled', true);
+    <HTMLButtonElement>e.target.setAttribute('disabled', true);
+    */
 
-    let errors = this.model.setData(newData);
-    if (Object.keys(errors) !== 0) {
-      for (let key in errors) {                             
-				let messages = errors[key];
-        this.errorMsg(this, key, messages);                              
-      };                                                                          
-      this.$('.help-block').prev().scrollTo(25);                                   
-      if(form.length > 0) {                                                        
-        form[0].removeAttribute('disabled');                                       
-      }                                                                       
-      e.target.removeAttribute('disabled');                                        
+    this.model.setData(newData);
+    let errors = this.model.validate();
+
+    if (Object.keys(errors).length !== 0) {
+      for (let key in errors) {
+        // ToDo
+        // this.errorMsg(key, errors[key]);
+      };
+      // ToDo
+      // this.find('.help-block').prev().scrollTo(25);
+      if(form.length > 0) {
+        form[0].removeAttribute('disabled');
+      }
+      (<HTMLButtonElement>e.target).removeAttribute('disabled');
       return false;
     } else {
       app.showLoading();
-      this.model.save().then((response) => {
+      this.model.save().then((response:any) => {
 
         // this.clearErrorMsgs();
-        let defaultAction  = 1;
-        if (typeof this._success == 'function') {
-          defaultAction = this._success(response);
-        }
-
-        if(defaultAction == 1) {
+        if(this._success(response)) {
 
           if(form.length > 0) {
             form[0].removeAttribute('disabled');
           }
-          e.target.removeAttribute('disabled');
+          (<HTMLButtonElement>e.target).removeAttribute('disabled');
 
           $('body').scrollTo();
           app.routers.navigate(
@@ -143,20 +167,21 @@ class FormView extends View {
 
   }
 
-  getSuccessUrl() {
+  getSuccessUrl(data:any):string {
+    return '';
   }
 
-  _success(data) {
+  _success(data:any):boolean {
     return true;
   }
 
-  clearErrorMsgs(attr, selector) {
+  clearErrorMsgs():void {
     this.find('.alert').remove();
-    this.find('.has-error').removeClass('has-error');
+    this.find('.has-error').classList.remove('has-error');
     this.find('.help-block').remove();
   }
 
-  errorMsg(attr, error, selector) {
+  errorMsg(attr:string, error:any):void {
     /*
     // If we have error for json/nested fieds
     // we need get all keys and show error for each key
@@ -164,7 +189,7 @@ class FormView extends View {
     if (Array.isArray(error) !== true && typeof error == 'object') {
       _(error).forEach((el, k) => {
         _(el).forEach((errors, key) => {
-          this.errorMsg(attr + '__' + k + '__' + key, errors, selector);
+          this.errorMsg(attr + '__' + k + '__' + key, errors);
         });
       });
       return false;

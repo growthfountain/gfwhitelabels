@@ -16,6 +16,7 @@
     "dist": "./node_modules/gulp/bin/gulp.js styles && cp -rf src/img dist/ && cp -rf src/js dist/ && cp src/BingSiteAuth.xml dist/"
   },
   "devDependencies": {
+    "@types/jquery": "^3.2.9",
     "awesome-typescript-loader": "^3.2.1",
     "babel-core": "^6.24.0",
     "babel-loader": "^7.1.1",
