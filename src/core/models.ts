@@ -47,7 +47,7 @@ class Model implements IModel {
     }
   }
 
-  validate(data:any=null):Object {
+  validate(data:any=null):any {
     if (data === null) {
       data = this.data;
     }
@@ -55,7 +55,11 @@ class Model implements IModel {
   }
 
   save():any {
-   return true; 
+    return api.makeRequest(
+        this.getURL(),
+        this.method,
+        this.data
+    );
   }
 
   getURL():string {

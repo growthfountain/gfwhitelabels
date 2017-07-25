@@ -2,6 +2,17 @@ const socialAuth = require('./social-auth.js');
 const coreViews = require('core/views.ts');
 
 debugger;
+app.user = coreModels.default.anonymouseAccount();
+/*
+app.user.validate = () => { return {} };
+app.user.save = () => { 
+  return api.makeRequest(                                                        
+    this.getURL(),                                                             
+    this.method,                                                               
+    this.data                                                                  
+  ); 
+}
+*/
 let loginView = new coreViews.default.FormView(app.user);
 loginView._success = (data) => { app.user.setData(data); };
 loginView.template = require('./templates/login.pug');

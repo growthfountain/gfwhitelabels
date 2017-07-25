@@ -40,13 +40,13 @@ class View {
     }
 
     let oldDirectives = Object.assign(this.directives, directives);
+    this.events = Object.assign(this.events, events);
     this.directives = [];
 
     for(let key in oldDirectives) {
       this.directives.push(new oldDirectives[key](this.el));
     }
 
-    console.log('attach events'); 
     console.log('send class created event'); // app.events.sendEvent(this, 'created');
   }
 
@@ -60,6 +60,7 @@ class View {
 
   render() {
     this.el.innerHTML = this.template(this.model);
+    this.bindEvents();
 
     for(let key in this.directives) {
       this.directives[key].render();
@@ -67,6 +68,23 @@ class View {
 
     console.log('send class rendered event'); // app.events.sendEvent(this, 'rendered');
     return this;
+  }
+
+  bindEvents() {
+    this.unbindEvents();
+    for(let key in this.events) {
+      let method:any = this[this.events[key]];
+      let match:string[] = key.match(delegateEventSplitter);
+      this.el.addEventListener(match[1], method.bind(this));
+    }
+  }
+
+  unbindEvents() {
+    for(let key in this.events) {
+      let method:any = this[this.events[key]];
+      let match:string[] = key.match(delegateEventSplitter);
+      this.el.removeEventListener(match[1], method.bind(this));
+    }
   }
 
   // Remove this view by taking the element out of the DOM, and removing any
@@ -99,7 +117,6 @@ class FormView extends View {
       throw 'Please provide model for FormView';
     }
 
-    debugger;
     events['submit form'] = 'submit';
     super(model, events, directives, selector, ...args);
   }
@@ -107,11 +124,11 @@ class FormView extends View {
   submit(e:Event, newData:any=null) {
     e.preventDefault();
 
-    let form = $(e.target).closest('form');
+    let form = (<HTMLButtonElement>e.target).closest('form');
     this.clearErrorMsgs();
 
     if (newData === null) {
-      newData = form.closest('form').serializeJSON();
+      newData = $(form).serializeJSON();
     }
 
     /* 
@@ -123,8 +140,7 @@ class FormView extends View {
     <HTMLButtonElement>e.target.setAttribute('disabled', true);
     */
 
-    this.model.setData(newData);
-    let errors = this.model.validate();
+    let errors = this.model.validate(newData);
 
     if (Object.keys(errors).length !== 0) {
       for (let key in errors) {
@@ -133,20 +149,22 @@ class FormView extends View {
       };
       // ToDo
       // this.find('.help-block').prev().scrollTo(25);
-      if(form.length > 0) {
-        form[0].removeAttribute('disabled');
+      if(form) {
+        form.removeAttribute('disabled');
       }
       (<HTMLButtonElement>e.target).removeAttribute('disabled');
       return false;
     } else {
       app.showLoading();
+
+      this.model.setData(newData);
       this.model.save().then((response:any) => {
 
         // this.clearErrorMsgs();
         if(this._success(response)) {
 
-          if(form.length > 0) {
-            form[0].removeAttribute('disabled');
+          if(form) {
+            form.removeAttribute('disabled');
           }
           (<HTMLButtonElement>e.target).removeAttribute('disabled');
 
@@ -176,9 +194,16 @@ class FormView extends View {
   }
 
   clearErrorMsgs():void {
-    this.find('.alert').remove();
-    this.find('.has-error').classList.remove('has-error');
-    this.find('.help-block').remove();
+    if(this.find('.alert')) {
+      this.find('.alert').remove();
+    }
+    if(this.find('.has-error')) {
+      debugger;
+      this.find('.has-error').classList.remove('has-error');
+    }
+    if(this.find('.help-block')) {
+      this.find('.help-block').remove();
+    }
   }
 
   errorMsg(attr:string, error:any):void {
