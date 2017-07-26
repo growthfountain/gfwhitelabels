@@ -128,7 +128,7 @@ module.exports = {
     template: require('./templates/step1.pug'),
 
     events: _.extend({
-      'change .js-select': saveValue,
+      'change select': saveValue,
       'blur [type=money]': saveValue,
       'submit form': 'nextStep',
     }),
@@ -151,13 +151,21 @@ module.exports = {
           validate: {},
         },
       };
+
+      const data = app.helpers.calculator.readCalculatorData(CALCULATOR_NAME);
+      if (!data.industry) {
+        data.industry = 'Machinery';
+        app.helpers.calculator.saveCalculatorData(CALCULATOR_NAME, data);
+      }
     },
 
     nextStep(e) {
       e.preventDefault();
 
-      if (!this.validate(e))
+      if (!this.validate(e)) {
+        this.$('.help-block').prev().scrollTo(50);
         return;
+      }
 
       app.routers.navigate('/calculator/establishedBusiness/step-2', {trigger: true});
     },
@@ -233,8 +241,10 @@ module.exports = {
     nextStep(e) {
       e.preventDefault();
 
-      if (!this.validate(e))
+      if (!this.validate(e)) {
+        this.$('.help-block').prev().scrollTo(50);
         return;
+      }
 
       app.routers.navigate('/calculator/establishedBusiness/step-3', {trigger: true});
     },
@@ -336,8 +346,10 @@ module.exports = {
     doCalculation(e) {
       e.preventDefault();
 
-      if (!this.validate(e))
+      if (!this.validate(e)) {
+        this.$('.help-block').prev().scrollTo(50);
         return;
+      }
 
       const data = app.helpers.calculator.readCalculatorData(CALCULATOR_NAME);
 
@@ -429,7 +441,7 @@ module.exports = {
 
       app.helpers.calculator.saveCalculatorData(CALCULATOR_NAME, data);
 
-      app.routers.navigate('/calculator/establishedBusiness/finish', {trigger: true});
+      setTimeout(() => app.routers.navigateWithReload('/calculator/establishedBusiness/finish', {trigger: true}), 10);
     },
 
     render: function () {
