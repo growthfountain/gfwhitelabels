@@ -25,19 +25,16 @@ module.exports = {
         raiseMoney: {
           required: true,
           type: 'money',
-          validate: {},
           label: 'How much is the company raising?'
         },
         nextYearRevenue: {
           required: true,
           type: 'money',
-          validate: {},
           label: 'What do you expect next year\'s revenue share to be?',
         },
         growLevel: {
           required: true,
-          type: 'integer',
-          validate: {},
+          type: 'percent',
           label: 'At what rate do you expect revenues to grow each year?',
         },
       };
@@ -49,12 +46,7 @@ module.exports = {
       if (!this.validate(e))
         return;
 
-      app.emitGoogleAnalyticsEvent('calculate-revenue-share', {
-        eventCategory: 'Calculator',
-        eventAction: 'calculate',
-        eventLabel: 'Company',
-        eventValue: window.location.pathname,
-      });
+      app.analytics.emitEvent(app.analytics.events.CalculatorUsed, app.user.stats);
       const filterNumberRx = /[^0-9\.]/g;
       this.data.raiseMoney = Number(this.$raiseMoney.val().replace(filterNumberRx, ''));
       this.data.nextYearRevenue = Number(this.$nextYearRevenue.val().replace(filterNumberRx, ''));

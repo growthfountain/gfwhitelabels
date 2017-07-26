@@ -1,7 +1,3 @@
-const chai      = require('chai');
-const sinon     = require('sinon');
-const should    = chai.should();
-const expect    = chai.expect;
 const rules     = require('./rules.js');
 
 describe('Attribute validation', function () {``
