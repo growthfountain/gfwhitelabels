@@ -882,8 +882,52 @@ describe('Investment page', () => {
 
   });
 
-  it('saveEsign', () => {
+  describe('updateIncomeWorth', () => {
+    beforeEach(() => {
+      $('#income_worth_modal').find('.submit-income-worth').on('click', inst.View.updateIncomeWorth.bind(inst.View));
+    });
+
+    afterEach(() => {
+      $('#income_worth_modal').find('.submit-income-worth').off('click');
+    });
+
+    it('required validation', () => {
+      $('#net_worth').val('');
+      $('#annual_income').val('');
+
+      let $networthModal = $('#income_worth_modal');
+      let $submitButton = $networthModal.find('.submit-income-worth');
+      $submitButton.on('click', inst.View.updateIncomeWorth.bind(inst.View));
+      expect(api.makeRequest.called).to.equal(false);
+    });
+
+    it('valid data saved on server', () => {
+      $('#net_worth').val('12345');
+      $('#annual_income').val('12345');
+
+      if (api.makeRequest.restore)
+        api.makeRequest.restore();
+
+      testHelpers.stubMakeRequest({
+        annual_income: 123456,
+        net_worth: 1234579,
+      });
+
+      let $networthModal = $('#income_worth_modal');
+      let $submitButton = $networthModal.find('.submit-income-worth');
+      $submitButton.on('click', inst.View.updateIncomeWorth.bind(inst.View));
+      $submitButton.click();
+
+      expect(api.makeRequest.called).to.equal(true);
+
+      expect($('span.current-limit').text()).to.equal(inst.View._maxAllowedAmount.toLocaleString('en-US'));
+      expect(inst.View.$amount.data('max')).to.equal(inst.View._maxAllowedAmount);
+    });
+
     // посмотреть, покрыть тестами что возможно
   });
 
+  describe('saveEsign', () => {
+
+  });
 });
