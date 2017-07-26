@@ -1,5 +1,6 @@
-import Model from "./models";
+import { Model } from "./models";
 import * as $ from "jquery";
+
 
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 var app = {
@@ -73,7 +74,8 @@ class View {
   bindEvents() {
     this.unbindEvents();
     for(let key in this.events) {
-      let method:any = this[this.events[key]];
+      let temp:any = this.events[key];
+      let method:any = this[temp];
       let match:string[] = key.match(delegateEventSplitter);
       this.el.addEventListener(match[1], method.bind(this));
     }
@@ -81,7 +83,8 @@ class View {
 
   unbindEvents() {
     for(let key in this.events) {
-      let method:any = this[this.events[key]];
+      let temp:any = this.events[key];
+      let method:any = this[temp];
       let match:string[] = key.match(delegateEventSplitter);
       this.el.removeEventListener(match[1], method.bind(this));
     }
@@ -98,6 +101,7 @@ class View {
   }
 
   destoryEvents() {
+    this.unbindEvents();
     delete this.events;
   }
 

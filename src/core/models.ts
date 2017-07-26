@@ -1,3 +1,7 @@
+import api from 'src/core/api.ts';
+
+declare var app:any;
+
 interface IData { 
   id: number;
   [propName: string]: any;
@@ -11,7 +15,7 @@ interface IModel {
   [propName: string]: any;
 }
 
-class Model implements IModel {
+export class Model {
 
   protected updatedKeys:string[] = [];
 
@@ -29,47 +33,54 @@ class Model implements IModel {
     }
 
     for(let key in this.data) {
-      Object.defineProperty(this, key, {
-        get: () => { return this.data[key]; },
-        set: (value:any) =>  { 
-          if (this.data[key] !== value) {
-            this.data[key] = value;
-            this.updatedKeys.push(key);
-          }
-        },
-      });
+      if (key !== 'data') {
+        Object.defineProperty(this, key, {
+          get: () => { return this.data[key]; },
+          set: (value:any) =>  { 
+            if (this.data[key] !== value) {
+              this.data[key] = value;
+              this.updatedKeys.push(key);
+            }
+          },
+        });
+      }
     }
   }
 
-  setData(data:any):void {
+  public setData(data:any):void {
     for (let key in data) {
-      this.data[key] = data.key;
+      if (this.data[key] !== data[key]) {
+        this.data[key] = data[key];
+        this.updatedKeys.push(key);
+      }
     }
   }
 
-  validate(data:any=null):any {
+  public validate(data:any=null):any {
     if (data === null) {
       data = this.data;
     }
     return {};
   }
 
-  save():any {
+  public save():any {
+    /*
     return api.makeRequest(
         this.getURL(),
         this.method,
         this.data
     );
+     */
   }
 
-  getURL():string {
+  public getURL():string {
     if (this.data.id) {
       return this.baseUrl + '/' + this.data.id;
     }
     return this.baseUrl;
   }
 
-  toJSON():Object {
+  public toJSON():Object {
     let data = Object.assign({}, this.data); 
     return data;
   }
@@ -118,6 +129,34 @@ class Model implements IModel {
     }
   }
   */
+
+  get():any {
+    api.makeRequest(
+      this.getURL(),
+      'GET',
+    ).then((data:any) => {
+      debugger;
+      this.data = data;
+    });
+  }
 }
 
-export default Model;
+export class AnonymousUser extends Model {
+  baseUrl:string = app.config.authServer + '/rest-auth/login';
+  fields:any = {
+    email: {
+      type: 'email',
+      required: true
+    },
+    password: {
+      type: 'password',
+      required: true,
+      minLength: 8,
+      label: 'Password',
+    },
+    domain: {
+      type: 'string',
+      required: true,
+    },
+  };
+};
