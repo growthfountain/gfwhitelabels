@@ -648,7 +648,7 @@ describe('Investment page', () => {
 
   beforeEach(() => {
     testHelpers.stubMakeRequest({});
-    app.emitCompanyAnalyticsEvent = sinon.stub(app, 'emitCompanyAnalyticsEvent');
+    app.analytics.emitCompanyCustomEvent = sinon.stub(app.analytics, 'emitCompanyCustomEvent');
     const companyData = JSON.parse(JSON.stringify(mocks.company.data));
     inst.View = new Views.investment({
       model: new app.models.Company(companyData, mocks.investment.fields),
@@ -662,13 +662,13 @@ describe('Investment page', () => {
     inst.View.undelegateEvents();
     $('#content').empty();
     delete inst.View;
-    app.emitCompanyAnalyticsEvent.restore();
+    app.analytics.emitCompanyCustomEvent.restore();
     api.makeRequest.restore();
   });
 
-  it('emitCompanyAnalyticsEvent', () => {
-    expect(app.emitCompanyAnalyticsEvent.called).to.equal(true);
-    expect(app.emitCompanyAnalyticsEvent.args[0][0]).to.equal(mocks.company.data.ga_id);
+  it('emitCompanyCustomEvent', () => {
+    expect(app.analytics.emitCompanyCustomEvent.called).to.equal(true);
+    expect(app.analytics.emitCompanyCustomEvent.args[0][0]).to.equal(mocks.company.data.ga_id);
   });
 
   describe('calcFeeWithCredit', () => {
