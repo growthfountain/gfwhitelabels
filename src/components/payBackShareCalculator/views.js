@@ -35,29 +35,14 @@ module.exports = {
         raiseMoney: {
           required: true,
           type: 'money',
-          fn(name, fn, attr, data, schema) {
-            const value = this.getData(data, name);
-            if (value <= 0)
-              throw 'Please, enter positive number';
-          },
         },
         nextYearRevenue: {
           required: true,
           type: 'money',
-          fn(name, fn, attr, data, schema) {
-            const value = this.getData(data, name);
-            if (value <= 0)
-              throw 'Please, enter positive number';
-          },
         },
         growLevel: {
           required: true,
           type: 'percent',
-          fn(name, fn, attr, data, schema) {
-            const value = this.getData(data, name);
-            if (value <= 0)
-              throw 'Please, enter positive number';
-          },
         },
       };
     },
@@ -72,8 +57,10 @@ module.exports = {
 
     doCalculation(e) {
       e.preventDefault();
-      if (!this.validate(e))
+      if (!this.validate(e)) {
+        this.$('.help-block').prev().scrollTo(50);
         return;
+      }
 
       const calculatorData = app.helpers.calculator.readCalculatorData(CALCULATOR_NAME);
       let maxOfMultipleReturned = 0;
@@ -140,7 +127,7 @@ module.exports = {
 
       app.helpers.calculator.saveCalculatorData(CALCULATOR_NAME, calculatorData);
 
-      setTimeout(() => app.routers.navigate('/calculator/paybackshare/step-3', {trigger: true}), 100);
+      setTimeout(() => app.routers.navigateWithReload('/calculator/paybackshare/step-3', { trigger: true }), 10);
     },
 
     // get sum of last Annual Distributions

@@ -1,24 +1,12 @@
-const chai      = require('chai');
-const sinon     = require('sinon');
-const should    = chai.should();
-const expect    = chai.expect;
-
 const Views = require('src/components/anonymousAccount/views.js');
 const eventEmitter = _.extend({}, Backbone.Events);
 
 const inst = {};
 const setData = app.user.setData;
 app.user.setData = function(...args) {
-  setData.call(app.user, ...args).then(() => {
+  return setData.call(app.user, ...args).then(() => {
     eventEmitter.trigger('done');
   });
-};
-
-const stubMakeRequest = (response) => {
-  api.makeRequest = sinon.stub(api, 'makeRequest');
-  const dfr = $.Deferred();
-  dfr.resolve(response);
-  api.makeRequest.returns(dfr);
 };
 
 const readUserData = () => {
@@ -59,7 +47,7 @@ describe('Log-in page', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeLoginResponse);
+    testHelpers.stubMakeRequest(fakeLoginResponse);
     inst.LoginView = new Views.login({
       el: '#content',
       model: {}
@@ -148,7 +136,7 @@ describe('Sign-up page', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeLoginResponse);
+    testHelpers.stubMakeRequest(fakeLoginResponse);
 
     inst.SignupView = new Views.signup({
       el: '#content',
@@ -225,7 +213,7 @@ describe('Sign-up popup', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeSignupResponse);
+    testHelpers.stubMakeRequest(fakeSignupResponse);
     inst.SignupPopup = new Views.popupSignup();
     inst.SignupPopup.render();
   });
@@ -314,7 +302,7 @@ describe('Log-in popup', () => {
   };
 
   beforeEach(() => {
-    stubMakeRequest(fakeLoginResponse);
+    testHelpers.stubMakeRequest(fakeLoginResponse);
     inst.SignupPopup = new Views.popupLogin({});
     inst.SignupPopup.render();
   });

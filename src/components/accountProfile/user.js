@@ -189,7 +189,10 @@ class User {
         if (responseData) {
           this.updateLocalStorage();
         }
-        return resolve()
+
+        app.analytics.emitEvent(app.analytics.events.LoggedIn, app.user.stats);
+
+        return resolve();
       }).fail(() => {
         this.emptyLocalStorage();
         setTimeout(() => {
@@ -350,6 +353,20 @@ class User {
 
   getCompaniesMember() {
     return this.companiesMember;
+  }
+
+  get stats() {
+    const full_name = ((this.data.first_name || this.data.last_name) ? (`${this.data.first_name} ${this.data.last_name}`) : '').trim();
+    if (this.data.id) {
+      return {
+        user: {
+          id: this.data.id,
+          email: this.data.email,
+          full_name,
+        },
+      };
+    }
+    return {};
   }
 
 }
