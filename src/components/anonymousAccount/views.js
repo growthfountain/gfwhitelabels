@@ -155,9 +155,9 @@ const Views = {
     },
 
     _success(data) {
-      app.emitFacebookPixelEvent('CompleteRegistration');
-
-      app.user.setData(data);
+      app.user.setData(data).then(() => {
+        app.analytics.emitEvent(app.analytics.events.RegistrationCompleted, app.user.stats);
+      });
       this.$modal.modal('hide');
     },
 
@@ -211,13 +211,14 @@ const Views = {
     },
 
     _success(data) {
-      app.emitFacebookPixelEvent('CompleteRegistration');
-      app.user.setData(data);
+      app.user.setData(data).then(() => {
+        app.analytics.emitEvent(app.analytics.events.RegistrationCompleted, app.user.stats);
+      });
     },
 
     loginWithSocial(e) {
       socialAuth.loginWithSocialNetwork.call(this, e);
-    }
+    },
 
   }),
 
@@ -244,7 +245,7 @@ const Views = {
     },
 
     _success(data) {
-      app.emitFacebookPixelEvent('CompleteRegistration');
+      app.analytics.emitEvent(app.analytics.events.RegistrationCompleted, app.user.stats);
 
       app.hideLoading();
       $('body').scrollTo();

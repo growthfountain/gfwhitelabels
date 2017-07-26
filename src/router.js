@@ -55,7 +55,6 @@ module.exports = Backbone.Router.extend(_.extend({
         ) {
       window.location = window.location.pathname.substr(0, window.location.pathname.length-1);
     }
-    app.emitFacebookPixelEvent();
 
     app.clearClasses('#page', ['page']);
 
@@ -93,6 +92,16 @@ module.exports = Backbone.Router.extend(_.extend({
     $('#content').off('click');
     //$('form').undelegate();
     $('.popover').popover('hide');
+  },
+
+  navigateWithReload(href, options) {
+    const currentLocation = window.location.pathname + (window.location.search || '');
+    if (href === currentLocation) {
+      setTimeout(() => { window.location.reload(); }, 10);
+      return true;
+    }
+
+    this.navigate(href, options);
   },
 
 }, routesMap.methods));

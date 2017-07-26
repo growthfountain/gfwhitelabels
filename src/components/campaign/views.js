@@ -7,6 +7,36 @@ const validation = require('components/validation/validation.js');
 
 const CalculatorView = require('./revenueShareCalculator.js');
 
+const preventScrollHandler = (e) => {
+  e.preventDefault();
+  return false;
+};
+
+const preventBodyScrolling = (preventScroll) => {
+  if (preventScroll === true) {
+    document.body.addEventListener("touchmove", preventScrollHandler);
+  } else {
+    document.body.removeEventListener("touchmove", preventScrollHandler);
+  }
+};
+
+const AMOUNT_VALIDATION_ENUM = {
+  VALID: 0,
+  LT_MIN: 1,
+  GT_MAX: 2,
+};
+
+const validateAmount = (amount, min, max) => {
+  amount = Number(amount);
+
+  if (amount < min)
+    return AMOUNT_VALIDATION_ENUM.LT_MIN;
+
+  if (amount > max)
+    return AMOUNT_VALIDATION_ENUM.GT_MAX;
+
+  return AMOUNT_VALIDATION_ENUM.VALID;
+};
 
 module.exports = {
   list: Backbone.View.extend({
@@ -16,8 +46,6 @@ module.exports = {
       'change select.orderby': 'orderby',
     },
     initialize(options) {
-      options.collection.data = options.collection.data.map(companyData => new app.models.Company(companyData));
-      options.collection.data = options.collection.data.filter(companyData => !companyData.campaign.expired);
       this.collection = options.collection;
     },
 
@@ -26,7 +54,7 @@ module.exports = {
 
       require('bootstrap-select/sass/bootstrap-select.scss');
 
-      let selectPicker = require('bootstrap-select');
+      require('bootstrap-select');
       this.$el.html('');
       this.$el.append(
         this.template({
@@ -88,7 +116,7 @@ module.exports = {
       };
 
       if (this.model.ga_id) {
-        app.emitCompanyAnalyticsEvent(this.model.ga_id);
+        app.analytics.emitCompanyCustomEvent(this.model.ga_id);
       }
     },
 
@@ -232,12 +260,43 @@ module.exports = {
             openEffect  : 'elastic',
             closeEffect : 'elastic',
 
-            helpers : {
+            helpers: {
               title : {
                 type : 'inside'
-              }
+              },
+              // overlay: {
+              //   locked: false
+              // }
+            },
+            beforeShow(){
+              const $html = $('html');
+              ['fancybox-margin', 'fancybox-lock'].forEach((cssClass) => {
+                if (!$html.hasClass(cssClass)) {
+                  $html.addClass(cssClass);
+                }
+              });
+              preventBodyScrolling(true);
+              // $('html').css('overflowX', 'visible');
+              // $('body').css('overflowY', 'hidden');
+            },
+            afterClose(){
+              $('html').removeClass('fancybox-margin fancybox-lock');
+              // $('html').css('overflowX', 'hidden');
+              // $('body').css('overflowY', 'visible');
+              preventBodyScrolling(false);
             }
           });
+
+          // $fancyBox.fancybox({
+          //   openEffect  : 'elastic',
+          //   closeEffect : 'elastic',
+          //
+          //   helpers : {
+          //     title : {
+          //       type : 'inside'
+          //     }
+          //   }
+          // });
           resolve();
         }, 'fancybox_chunk');
       });
@@ -483,7 +542,6 @@ module.exports = {
       };
       */
 
-
       this.fields.signature = {
         type: 'nested',
         requiredTemp: true,
@@ -493,34 +551,32 @@ module.exports = {
         required: true,
       };
 
-      const validateAmount = (amount) => {
-        amount = Number(amount);
-        let min = this.model.campaign.minimum_increment;
-        let max = this._maxAllowedAmount;
-        let validationMessage = '';
+      const validateAmountWithErrorMessage = (amount) => {
+        const res = validateAmount(amount,
+          this.model.campaign.minimum_increment,
+          this._maxAllowedAmount);
 
-        if (amount < min) {
-          validationMessage = 'Sorry, minimum investment is $' + min;
-        }
+        if (res === AMOUNT_VALIDATION_ENUM.VALID)
+          return true;
 
-        if (amount > max) {
-          validationMessage = 'Sorry, your amount is too high, please update your income or change amount';
-        }
+        setTimeout(() => {
+          this.$amount.popover('show');
+          this.$amount.scrollTo(200);
+        }, 700);
 
-        if (validationMessage) {
-          setTimeout(() => {
-            this.$amount.popover('show');
-            this.$amount.scrollTo(200);
-          }, 700);
-          throw validationMessage;
-        }
+        if (res === AMOUNT_VALIDATION_ENUM.LT_MIN)
+          throw `Sorry, minimum investment is $${this.model.campaign.minimum_increment}`;
+
+        if (res === AMOUNT_VALIDATION_ENUM.GT_MAX)
+          throw 'Sorry, your amount is too high, please update your income or change amount';
 
         return true;
       };
 
       this.fields.amount.fn = function(name, value, attr, data, computed) {
-        return validateAmount(value);
+        return validateAmountWithErrorMessage(value);
       };
+
       this.fields.amount.positiveOnly = true;
 
       this.model.campaign.expiration_date = new Date(this.model.campaign.expiration_date);
@@ -533,37 +589,38 @@ module.exports = {
           },
           choices: COUNTRIES
         },
+        messageRequired: 'Not a valid choice',
       });
 
       this.fields.personal_information_data.schema.phone = _.extend(this.fields.personal_information_data.schema.phone, {
-        required: false,
-        fn: function(name, value, attr, data, schema) {
-          let country = this.getData(data, 'personal_information_data.country');
-          if (country == 'US')
-            return;
-
-          return this.required(name, true, attr, data);
-        },
+        // required: false,
+        // fn: function(name, value, attr, data, schema) {
+        //   let country = this.getData(data, 'personal_information_data.country');
+        //   if (country == 'US')
+        //     return;
+        //
+        //   return this.required(name, true, attr, data);
+        // },
       });
 
       this.fields.personal_information_data.schema.city = _.extend(this.fields.personal_information_data.schema.city, {
-        fn: function(name, value, attr, data, schema) {
-          let country = this.getData(data, 'personal_information_data.country');
-          if (country == 'US')
-            return;
-          return this.required(name, true, attr, data);
-        },
-        required: false,
+        // fn: function(name, value, attr, data, schema) {
+        //   let country = this.getData(data, 'personal_information_data.country');
+        //   if (country == 'US')
+        //     return;
+        //   return this.required(name, true, attr, data);
+        // },
+        // required: false,
       });
 
       this.fields.personal_information_data.schema.state = _.extend(this.fields.personal_information_data.schema.state, {
         required: false,
-        fn: function(name, value, attr, data, schema) {
-          let country = this.getData(data, 'personal_information_data.country');
-          if (country == 'US')
-            return;
-          return this.required(name, true, attr, data);
-        },
+        // fn: function(name, value, attr, data, schema) {
+        //   let country = this.getData(data, 'personal_information_data.country');
+        //   if (country == 'US')
+        //     return;
+        //   return this.required(name, true, attr, data);
+        // },
       });
 
       // this.user.ssn_re = this.user.ssn;
@@ -578,7 +635,7 @@ module.exports = {
           city: 'City',
         },
         payment_information_data: {
-          name_on_bank_account: 'Name on Bank Account',
+          name_on_bank_account: 'Name As It Appears on Bank Account',
           account_number: 'Account Number',
           account_number_re: 'Re-enter Account Number',
           routing_number: 'Routing Number',
@@ -629,7 +686,12 @@ module.exports = {
       this.initMaxAllowedAmount();
 
       if (this.model.ga_id)
-        app.emitCompanyAnalyticsEvent(this.model.ga_id);
+        app.analytics.emitCompanyCustomEvent(this.model.ga_id);
+
+      app.cookies.set('token', app.user.token, {
+        domain: '.' + app.config.domainUrl,
+        path: '/',
+      });
     },
 
     render() {
@@ -693,7 +755,7 @@ module.exports = {
         return {
           waived: 0,
           fee: fee,
-          remainCredit: 0,
+          remainingCredit: 0,
           credit: 0,
         };
 
@@ -755,22 +817,22 @@ module.exports = {
     },
 
     validateAmount(amount) {
-      amount = Number(amount);
-      let min = this.model.campaign.minimum_increment;
-      let max = this._maxAllowedAmount;
-      if (amount < min) {
+      const res = validateAmount(Number(amount),
+        this.model.campaign.minimum_increment,
+        this._maxAllowedAmount);
+
+      if (res === AMOUNT_VALIDATION_ENUM.LT_MIN) {
         this.updateAmountPopover('minimum-increment', true);
         return false;
       }
 
-      if (amount > max) {
+      if (res === AMOUNT_VALIDATION_ENUM.GT_MAX) {
         this.updateAmountPopover('amount-campaign', true);
         $('.popover a.update-income-worth')
           .off('click')
-          .on('click', (e) => {
+          .on('click', () => {
             this.$amount.popover('hide');
           });
-
         return false;
       }
 
@@ -789,7 +851,11 @@ module.exports = {
       if (maxInvestmentsPerYear > 107)
         maxInvestmentsPerYear = 107;
 
-      return Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
+      let allowedAmount = Math.round((maxInvestmentsPerYear * 1000 - investedPastYear - investedOtherSites));
+      if (allowedAmount< 0)
+        allowedAmount = 0;
+
+      return allowedAmount;
     },
 
     initMaxAllowedAmount() {
@@ -817,7 +883,7 @@ module.exports = {
       if (this.model.campaign.security_type == 1)
         return;
 
-      let amount = this.getNumber(e.target.value);
+      let amount = app.helpers.format.unformatMoney(e.target.value);
       if (!amount)
         return;
 
@@ -830,7 +896,7 @@ module.exports = {
 
       let newAmount = Math.ceil(amount / pricePerShare) *  pricePerShare;
 
-      this.$amount.val('$' + this.formatNumber(newAmount));
+      this.$amount.val(app.helpers.format.formatMoney(newAmount));
       this._updateTotalAmount();
 
       if (newAmount > amount) {
@@ -846,7 +912,7 @@ module.exports = {
 
       app.helpers.format.formatMoneyInputOnKeyup(e);
 
-      let amount = this.getNumber(e.target.value);
+      let amount = app.helpers.format.unformatMoney(e.target.value);
       if (!amount)
         return;
 
@@ -883,8 +949,8 @@ module.exports = {
     _updateTotalAmount() {
       const feeInfo = this.calcFeeWithCredit();
 
-      let totalAmount = this.getNumber(this.$amount.val()) + feeInfo.fee;
-      let formattedTotalAmount = '$' + this.formatNumber(totalAmount)
+      let totalAmount = app.helpers.format.unformatMoney(this.$amount.val()) + feeInfo.fee;
+      let formattedTotalAmount = app.helpers.format.formatMoney(totalAmount)
       this.$el.find('.total-investment-amount').text(formattedTotalAmount);
       this.$el.find('[name=total_amount]').val(formattedTotalAmount);
 
@@ -902,41 +968,28 @@ module.exports = {
       e.stopPropagation();
 
       app.helpers.format.formatMoneyInputOnKeyup(e);
-      const rx = /[\$,]/g;
 
-      let annualIncome = Number(this.$('#annual_income').val().replace(rx, ''));
-      let netWorth = Number(this.$('#net_worth').val().replace(rx, '')) || 0;
-      if (isNaN(annualIncome) || !annualIncome)
-        annualIncome = 0;
-      if (isNaN(netWorth) || !netWorth)
-        netWorth = 0;
-
-      let investedOnOtherSites = this.user.invested_on_other_sites;
-      let investedPastYear = this.user.invested_equity_past_year;
+      const annualIncome = app.helpers.format.unformatMoney(this.$('#annual_income').val()) || 0;
+      const netWorth = app.helpers.format.unformatMoney(this.$('#net_worth').val()) || 0;
 
       this.$('span.current-limit').text(
-        this.maxInvestmentsPerYear(annualIncome / 1000, netWorth / 1000, investedPastYear, investedOnOtherSites)
-          .toLocaleString('en-US')
+        this.maxInvestmentsPerYear(
+          annualIncome / 1000,
+          netWorth / 1000,
+          this.user.invested_equity_past_year,
+          this.user.invested_on_other_sites
+        ).toLocaleString('en-US')
       );
-
       return false;
     },
 
     updateIncomeWorth(e) {
-      const rx = /[\$,]/g;
-      let netWorth = $('#net_worth')
-        .val()
-        .trim()
-        .replace(rx, '') / 1000;
-
-      let annualIncome = $('#annual_income')
-        .val()
-        .trim()
-        .replace(rx, '') / 1000;
+      const $netWorth = $('#net_worth');
+      const $annualIncome = $('#annual_income');
 
       let data = {
-        net_worth: netWorth,
-        annual_income: annualIncome
+        net_worth: (app.helpers.format.unformatMoney($netWorth.val()) || 0) / 1000,
+        annual_income: (app.helpers.format.unformatMoney($annualIncome.val()) || 0) / 1000,
       };
 
       const validateRange = (value, min=0, max, prefix) => {
@@ -973,8 +1026,8 @@ module.exports = {
       }
 
       api.makeRequest(app.config.authServer + '/rest-auth/data', 'PATCH', data).done((data) => {
-        this.user.net_worth = netWorth;
-        this.user.annual_income = annualIncome;
+        this.user.net_worth = data.net_worth;
+        this.user.annual_income = data.annual_income;
 
         this.initMaxAllowedAmount();
         $('span.current-limit').text(this._maxAllowedAmount.toLocaleString('en-US'));
@@ -989,21 +1042,8 @@ module.exports = {
       });
     },
 
-    getSignature () {
-
-      app.cookies.set('token', app.user.token, {
-        domain: '.' + app.config.domainUrl,
-        path: '/',
-      });
-
-      const investForm = document.forms.invest_form;
-      const inputSignature = investForm.elements['signature[full_name]'];
-      const signature = inputSignature.value;
-      return signature;
-    },
-
     copyToSignature(e) {
-      const signature = this.getSignature();
+      const signature = $(e.target).closest('input').val();
       this.$('.signature').text(signature);
     },
 
@@ -1152,7 +1192,7 @@ module.exports = {
 
       return {
         compaign_id: this.model.id,
-        signature: this.getSignature(),
+        signature: formData.signature.full_name,
 
         fees_to_investor: companyFees.fees_to_investor,
         trans_percent: companyFees.trans_percent,
@@ -1194,8 +1234,7 @@ module.exports = {
     _success(data) {
       const feeInfo = this.calcFeeWithCredit();
       this.user.credit = feeInfo.remainingCredit;
-
-      app.emitFacebookPixelEvent('MakeInvestment');
+      app.analytics.emitEvent(app.analytics.events.InvestmentMade, app.user.stats);
       this.saveEsign(data);
     },
 
@@ -1206,7 +1245,7 @@ module.exports = {
     el: '#content',
     initialize(options) {
       if (this.model.company.ga_id)
-        app.emitCompanyAnalyticsEvent(this.model.company.ga_id);
+        app.analytics.emitCompanyCustomEvent(this.model.company.ga_id);
     },
 
     render() {
