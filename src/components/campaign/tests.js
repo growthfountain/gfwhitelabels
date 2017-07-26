@@ -653,7 +653,7 @@ describe('Investment page', () => {
     inst.View = new Views.investment({
       model: new app.models.Company(companyData, mocks.investment.fields),
       user: mocks.user.data,
-      fields: mocks.investment.fields,
+      fields: Object.assign({}, mocks.investment.fields),
     });
     inst.View.render();
   });
@@ -847,8 +847,39 @@ describe('Investment page', () => {
     //TODO: implement
   });
 
-  it('submit', () => {
-    // проверить if с payment_information_type
+  describe('submit', () => {
+    beforeEach(() => {
+      api.submitAction = sinon.stub(api, 'submitAction');
+    });
+    afterEach(() => {
+      api.submitAction.restore();
+    });
+
+    it('submit payment_information_type 1', () => {
+      inst.View.$('[name=payment_information_type]').val(1);
+
+      inst.View.$('#submitButton').click();
+      // expect(api.submitAction.called).to.equal(true);
+      expect(inst.View.fields.payment_information_data).to.be.undefined;
+      expect(api.submitAction.called).to.equal(true);
+    });
+
+    it('submit payment_information_type 2', () => {
+      inst.View.$('[name=payment_information_type]').val(2);
+
+      inst.View.$('#submitButton').click();
+      // expect(api.submitAction.called).to.equal(true);
+      expect(inst.View.fields.payment_information_data).to.be.undefined;
+      expect(api.submitAction.called).to.equal(true);
+    });
+
+    it('submit payment_information_type default', () => {
+      inst.View.$('#submitButton').click();
+      // expect(api.submitAction.called).to.equal(true);
+      expect(inst.View.fields.payment_information_data).not.to.be.undefined;
+      expect(api.submitAction.called).to.equal(true);
+    });
+
   });
 
   it('saveEsign', () => {
