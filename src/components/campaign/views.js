@@ -868,14 +868,6 @@ module.exports = {
         investedPastYear, investedOnOtherSites);
     },
 
-    getNumber(value) {
-      return Number(value.replace(/[\$,]/g, ''));
-    },
-
-    formatNumber(value) {
-      return value.toLocaleString('en-US');
-    },
-
     roundAmount(e) {
       // e.preventDefault();
 
