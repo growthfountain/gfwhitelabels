@@ -928,6 +928,465 @@ describe('Investment page', () => {
   });
 
   describe('saveEsign', () => {
+    const model = {"address_2":"Test Optional Address 1","city":"Test City 221","formc":{"fiscal_recent_group_data":[{"id":7474,"mime":"application/xml","name":"bank_statement.xml","urls":{"origin":"http://growthfountain-alpha-storage.s3-website-us-east-1.amazonaws.com/250796e5e9c4f27a721c45abd09b0294df7658c2.xml"}},{"id":7475,"mime":"application/xml","name":"bank_summary.xml","urls":{"origin":"http://growthfountain-alpha-storage.s3-website-us-east-1.amazonaws.com/e61b1b87ba38eb194ca03572a411681e472af136.xml"}}],"fiscal_prior_group_data":[{"id":7473,"mime":"application/pdf","name":"Scrum Guide.pdf","urls":{"origin":"/6bc236a9a66d93725d852e2cee58b9d5850b13d6.pdf"},"site_id":12}],"link_to_formc":"http://www.dlink.ru/"},"id":908,"total_views":409,"founding_state":"CA","facebook":"https://facebook.com/revenueshare","state":"FL","description":"111\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.","approved_date":"2017-07-26T14:42:46.319692+00:00","twitter":"https://twitter.com/revenueshare","ga_id":"UA-97185485-4","founding_date":"1988-01-01","owner":{"first_name":"Ratmir","email":"ratmir.asanov.1@yandex.ru","last_name":"Asanov"},"website":"https://website1.com","brief":"- Some text information. <br />\r\n- Some text information. <br />\r\n- Some text information. <br />","address_1":"Test Street Address 1","short_name":"Revenue Share Company (Ratmir) 1","slug":"test-legal-revenue-share-company-ratmir-1","name":"Test Legal Revenue Share Company (Ratmir) 1","owner_id":1077,"corporate_structure":1,"tagline":"Test Tagline 1","zip_code":"15003","is_approved":6,"linkedin":"https://linkedin.com/revenueshare","instagram":"https://instagram.com/revenueshare","industry":6,"campaign":{"security_type":1,"percentage_revenue":5,"site_id":23,"id":908,"amount_commited":0,"minimum_increment":500,"investor_presentation_file_id":4396,"length_days":60,"gallery_group_data":[{"id":4185,"mime":"image/jpeg","name":"Gallery 1_1.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/52057dfb9e28d21aa1aaf69232b9d1d9b9b795b3.jpg"}},{"id":4187,"mime":"image/jpeg","name":"Gallery 1_2.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/d2d7ce01aa5af0c12fc146b2223be2bab4667440.jpg"}},{"id":4189,"mime":"image/jpeg","name":"Gallery 1_3.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/a9f25238661d130b295bc22cdefd9a88c89178f6.jpg"}},{"id":4191,"mime":"image/jpeg","name":"Gallery 1_4.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/8dadc3e207721234155fc8ebeb35716bbd0ee055.jpg"}},{"id":4193,"mime":"image/jpeg","name":"Gallery 1_5.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/3a67a5da068f8ff0de64d41d3b284da2572f3c4a.jpg"}},{"id":4195,"mime":"image/jpeg","name":"Gallery 1_6.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/64b0ddfc79b0fb5a9e3536b43bce8219983053c1.jpg"}},{"id":4197,"mime":"image/jpeg","name":"Gallery 1_7.jpg","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/fae679d4ef17101ee50748be5d15569f307b8f91.jpg"}}],"investor_presentation_data":{"id":4396,"mime":"application/msword","name":"Монах, который продал свой Феррари -- Робин Шарма.doc","urls":{"origin":"http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/a4756f61615009a05ea6bcec6e039de950dca3f1.doc"},"site_id":23},"premoney_valuation":10000000,"gallery_group_id":531,"expiration_date":"2017-08-20T00:00:00.000Z","press":[{"link":"https://en.wikipedia.org/wiki/Test_article","headline":"Test Headline 1"},{"link":"http://www.hopkinsmedicine.org/institutional_review_board/guidelines_policies/guidelines/fda_test_articles.html","headline":"Test Headline 2"}],"maximum_raise":1000000,"list_image_data":[{"id":4184,"mime":"image/jpeg","name":"Thumbnail 1350x209.jpg","urls":["http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/f5eff423133e6872f1b819197620456908d5954d.jpg"]},{"id":4182,"mime":"image/jpeg","name":"Thumbnail 1.jpg","urls":["http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/bd7b421ac4ed06b82c849a2d7601f5681b1f587e.jpg"]}],"valuation_determination_other":"","valuation_determination":0,"pitch":"Why Should People Invest? 1","faq":[{"answer":"Some text answer. Some text answer. Some text answer. Some text answer. Some text answer. Some text answer. Some text answer.","question":"Test Question 1"},{"answer":"Some text answer. Some text answer. Some text answer. Some text answer. Some text answer. Some text answer. Some text answer.","question":"Test Question 1"}],"additional_video":[{"link":"https://www.youtube.com/watch?v=isaXqowHZuU","headline":"Test Additional Video for Campaign 1"},{"link":"https://vimeo.com/212891518","headline":"Test Additional Video for Campaign 2"}],"business_model":"Why We Are Raising Capital? 1","perks":[{"perk":"Test Describe the Perk 1","amount":1000},{"perk":"Test Describe the Perk 2","amount":11000}],"team_members":[{"bio":"Some text information.\r\nSome text information.\r\nSome text information.\r\nSome text information.\r\nSome text information.\r\nSome text information.\r\nSome text information.","city":"London","email":"ratmir.asanov.1@yandex.ru","order":1,"title":"Senior","college":"Some College","facebook":"","linkedin":"","last_name":"Test Last Name 1","first_name":"Test First Name 1","photo_data":{"id":4201,"urls":{"origin":"/c509986367279f6c202706674d3449aea0aff3c0.jpg","300x300":"/aec503ea4dcc0d625d1a471c8acc28e5620ac684.jpg"},"site_id":23},"photo_image_id":4201}],"intended_use_of_proceeds":"How We Intend To Make Money? 1","additional_info":[{"body":"Some text description. Some text description. Some text description. Some text description. Some text description. Some text description. Some text description.","title":"Test Title 1"},{"body":"Some text description. Some text description. Some text description. Some text description. Some text description. Some text description. Some text description.","title":"Test Title 2"}],"price_per_share":50.61,"amount_raised":29235,"video":"https://www.youtube.com/watch?v=qowIBnTXE3Q","minimum_raise":50000,"cap":2,"header_image_data":[{"id":4178,"mime":"image/jpeg","name":"Header 11597x958.jpg","urls":["http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/6ab03f175cf8f0cf311ef0ba32d07d738b191309.jpg"]},{"id":4176,"mime":"image/jpeg","name":"Header 1.jpg","urls":["http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/c42ab5ce49de72415054cdbb8b4b7cf9b490763a.jpg"]}]}};
+    const fields = {
+      "is_understand_securities_related": {
+        "type": "boolean",
+        "validate": {
+          "_OneOf": "OneOf"
+        },
+        "required": true
+      },
+      "amount": {
+        "type": "decimal",
+        "validate": {},
+        "required": true
+      },
+      "company_id": {
+        "type": "integer",
+        "validate": {},
+        "required": true
+      },
+      "payment_information_type": {
+        "type": "integer",
+        "validate": {},
+        "required": true
+      },
+      "payment_information_data": {
+        "type": "nested",
+        "validate": {},
+        "required": true,
+        "schema": {
+          "name_on_bank_account": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "account_number": {
+            "type": "crypt",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "bank_account_type": {
+            "type": "boolean",
+            "validate": {},
+            "required": true
+          },
+          "credit": {
+            "type": "decimal",
+            "validate": {},
+            "required": false
+          },
+          "account_number_fake": {
+            "type": "string",
+            "validate": {},
+            "required": false
+          },
+          "routing_number_fake": {
+            "type": "string",
+            "validate": {},
+            "required": false
+          },
+          "routing_number": {
+            "type": "crypt",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          }
+        }
+      },
+      "is_understand_investing_is_risky": {
+        "type": "boolean",
+        "validate": {
+          "_OneOf": "OneOf"
+        },
+        "required": true
+      },
+      "personal_information_data": {
+        "type": "nested",
+        "validate": {},
+        "required": true,
+        "schema": {
+          "first_name": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "phone": {
+            "type": "string",
+            "validate": {},
+            "required": false
+          },
+          "country": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "city": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "zip_code": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "street_address_1": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "state": {
+            "type": "string",
+            "validate": {},
+            "required": false
+          },
+          "last_name": {
+            "type": "string",
+            "validate": {
+              "_Length": "Length"
+            },
+            "required": true
+          },
+          "street_address_2": {
+            "type": "string",
+            "validate": {},
+            "required": false
+          }
+        }
+      },
+      "is_understand_restrictions_to_cancel_investment": {
+        "type": "boolean",
+        "validate": {
+          "_OneOf": "OneOf"
+        },
+        "required": true
+      },
+      "is_understand_difficult_to_resell_purchashed": {
+        "type": "boolean",
+        "validate": {
+          "_OneOf": "OneOf"
+        },
+        "required": true
+      },
+      "is_reviewed_educational_material": {
+        "type": "boolean",
+        "validate": {
+          "_OneOf": "OneOf"
+        },
+        "required": true
+      }
+    };
+    const userData = {
+      "accredited_investor_poor": true,
+      "bank_name": "Privat",
+      "first_name": "Vladimir",
+      "invested_on_other_sites": 0,
+      "linkedin": "",
+      "account_number": "*****6789",
+      "phone": "12345678",
+      "name_on_bank_account": "Vladimir Chagin",
+      "accredited_investor_5m": true,
+      "net_worth": 1076,
+      "zip_code": "03194",
+      "email": "vladimir.chagin@gmail.com",
+      "id": 176,
+      "routing_number": "*****6789",
+      "accredited_investor_choice": true,
+      "instagram": "",
+      "ssn": "*****6789",
+      "twitter": "",
+      "accredited_investor_200k": true,
+      "annual_income": 219,
+      "facebook": "",
+      "last_name": "Chagin",
+      "invested_equity_past_year": 0,
+      "city": "03330 Naves",
+      "street_address_2": "",
+      "image_image_id": 5643,
+      "country": "US",
+      "state": "",
+      "bank_account_type": false,
+      "street_address_1": "Koltsova blvd 14d",
+      "accredited_investor_1m": true,
+      "image_data": {
+        "id": 5643,
+        "urls": {
+          "main": "/faab8d1c62771c9c39b855f4d4c07517b65eb8a7.png",
+          "50x50": "/302ede188b480c5e6e2228c6efe4d36ecf227237.png",
+          "origin": "/d31369f05ff8ca88c3239f940c1ed76df1a8514f.png"
+        },
+        "name": "ava.png",
+        "site_id": 23,
+        "mime": "image/png"
+      },
+      "credit": 0,
+      "days_left": 0,
+      "info": [
+        {
+          "company_id": 941,
+          "campaign_id": 941,
+          "formc_id": 941,
+          "owner_id": 176,
+          "user_id": 176,
+          "is_paid": false,
+          "company": "MAC",
+          "role": 0
+        }
+      ]
+    };
+    
+    beforeEach(() => {
+      app.routers.navigate = sinon.stub(app.routers, 'navigate');
+      inst.View = new Views.investment({
+        model: new app.models.Company(model, fields),
+        user: userData,
+        fields: Object.assign({}, fields),
+      });
+      inst.View.render();
+    });
 
+    afterEach(() => {
+      app.routers.navigate.restore();
+      inst.View.undelegateEvents();
+      $('#content').empty();
+    });
+
+    it('should send data to theh esign server', () => {
+      const response = {
+        "id": 842,
+        "owner_id": 176,
+        "company_id": 908,
+        "campaign_id": 908,
+        "amount": 1234,
+        "number_of_shares": 0,
+        "created_date": "2017-07-27T08:15:45.458960+00:00",
+        "personal_information_data": {
+          "city": "03330 Naves",
+          "state": "",
+          "country": "US",
+          "zip_code": "03194",
+          "last_name": "Chagin",
+          "first_name": "Vladimir",
+          "street_address_1": "Koltsova blvd 14d",
+          "street_address_2": ""
+        },
+        "payment_information_type": 0,
+        "payment_information_data": {
+          "credit": 0,
+          "account_number": "*****6789",
+          "routing_number": "*****6789",
+          "bank_account_type": false,
+          "name_on_bank_account": "Vladimir Chagin"
+        },
+        "is_reviewed_educational_material": true,
+        "is_understand_restrictions_to_cancel_investment": true,
+        "is_understand_difficult_to_resell_purchashed": true,
+        "is_understand_investing_is_risky": true,
+        "is_understand_securities_related": true,
+        "perk": "Test Describe the Perk 1",
+        "status": 0,
+        "alter_time": "2017-07-27T08:15:45.458960+00:00",
+        "comission": 10,
+        "add_deposit_to_csv": false,
+        "deposit_csv_time": null,
+        "deposit_confirmed_in_bofl_account": false,
+        "deposit_confirmed_in_bofl_time": null,
+        "deposit_cancelled_by_investor": false,
+        "deposit_cancel_time": null,
+        "cancellation_amount": 0,
+        "add_withdrawal_to_csv": false,
+        "withdrawal_csv_time": null,
+        "withdrawal_confirmed_from_bofl_account": false,
+        "withdrawal_time": null,
+        "notes": "",
+        "site_id": 4,
+        "deposit_cancelled_by_manager": false,
+        "deposit_cancel_time_manager": null,
+        "deposit_transfer_to_issuer": false,
+        "deposit_transfer_to_issuer_time": null,
+        "cancelled_reason": "",
+        "feedback": "",
+        "rating": 0,
+        "security_type": 1,
+        "cap": 2,
+        "percentage_revenue": 5,
+        "campaign": {
+          "header_image_data": [
+            {
+              "id": 4178,
+              "mime": "image/jpeg",
+              "name": "Header 11597x958.jpg",
+              "urls": [
+                "http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/6ab03f175cf8f0cf311ef0ba32d07d738b191309.jpg"
+              ]
+            },
+            {
+              "id": 4176,
+              "mime": "image/jpeg",
+              "name": "Header 1.jpg",
+              "urls": [
+                "http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/c42ab5ce49de72415054cdbb8b4b7cf9b490763a.jpg"
+              ]
+            }
+          ],
+          "minimum_raise": 50000,
+          "expiration_date": "2017-08-20",
+          "maximum_raise": 1000000,
+          "minimum_increment": 500,
+          "amount_raised": 29235,
+          "investor_presentation_data": {
+            "id": 4396,
+            "mime": "application/msword",
+            "name": "Монах, который продал свой Феррари -- Робин Шарма.doc",
+            "urls": {
+              "origin": "http://growthfountain-master-storage.s3-website-us-east-1.amazonaws.com/a4756f61615009a05ea6bcec6e039de950dca3f1.doc"
+            },
+            "site_id": 23
+          },
+          "cap": 2
+        },
+        "company": {
+          "id": 908,
+          "name": "Revenue Share Company (Ratmir) 1",
+          "slug": "test-legal-revenue-share-company-ratmir-1",
+          "ga_id": "UA-97185485-4",
+          "description": "111\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information.\r\nSome Text Information."
+        },
+        "formc": {
+          "fiscal_recent_group_data": [
+            {
+              "id": 7474,
+              "mime": "application/xml",
+              "name": "bank_statement.xml",
+              "urls": {
+                "origin": "http://growthfountain-alpha-storage.s3-website-us-east-1.amazonaws.com/250796e5e9c4f27a721c45abd09b0294df7658c2.xml"
+              }
+            },
+            {
+              "id": 7475,
+              "mime": "application/xml",
+              "name": "bank_summary.xml",
+              "urls": {
+                "origin": "http://growthfountain-alpha-storage.s3-website-us-east-1.amazonaws.com/e61b1b87ba38eb194ca03572a411681e472af136.xml"
+              }
+            }
+          ],
+          "fiscal_prior_group_data": [
+            {
+              "id": 7473,
+              "mime": "application/pdf",
+              "name": "Scrum Guide.pdf",
+              "urls": {
+                "origin": "/6bc236a9a66d93725d852e2cee58b9d5850b13d6.pdf"
+              },
+              "site_id": 12
+            }
+          ],
+          "link_to_formc": "http://www.dlink.ru/"
+        }
+      };
+      const data = [
+        {
+          "compaign_id": 908,
+          "type": 2,
+          "object_id": 842,
+          "meta_data": {
+            "compaign_id": 908,
+            "signature": "vc",
+            "fees_to_investor": 10,
+            "trans_percent": 6,
+            "registration_fee": 500,
+            "commitment_date_x": "7/27/2017",
+            "issuer_legal_name": "Test Legal Revenue Share Company (Ratmir) 1",
+            "city": "Test City 221",
+            "state": "FL",
+            "zip_code": "15003",
+            "address_1": "Test Street Address 1",
+            "address_2": "Test Optional Address 1",
+            "jurisdiction_of_organization": "California",
+            "maximum_raise": "1,000,000",
+            "minimum_raise": "50,000",
+            "price_per_share": "50,.61",
+            "issuer_email": "ratmir.asanov.1@yandex.ru",
+            "issuer_signer": "Ratmir Asanov",
+            "investor_legal_name": "Vladimir Chagin",
+            "aggregate_inclusive_purchase": "$1,244",
+            "investment_amount": "1,234",
+            "investor_address": "Koltsova blvd 14d",
+            "investor_optional_address": "",
+            "investor_code": "03194",
+            "investor_city": "03330 Naves",
+            "investor_state": "",
+            "investor_email": "vladimir.chagin@gmail.com",
+            "investor_number_purchased": 24.38253309622604
+          },
+          "template": "invest/participation_agreement.pdf"
+        },
+        {
+          "compaign_id": 908,
+          "type": 1,
+          "object_id": 842,
+          "meta_data": {
+            "compaign_id": 908,
+            "signature": "vc",
+            "fees_to_investor": 10,
+            "trans_percent": 6,
+            "registration_fee": 500,
+            "commitment_date_x": "7/27/2017",
+            "issuer_legal_name": "Test Legal Revenue Share Company (Ratmir) 1",
+            "city": "Test City 221",
+            "state": "FL",
+            "zip_code": "15003",
+            "address_1": "Test Street Address 1",
+            "address_2": "Test Optional Address 1",
+            "jurisdiction_of_organization": "California",
+            "maximum_raise": "1,000,000",
+            "minimum_raise": "50,000",
+            "price_per_share": "50,.61",
+            "issuer_email": "ratmir.asanov.1@yandex.ru",
+            "issuer_signer": "Ratmir Asanov",
+            "investor_legal_name": "Vladimir Chagin",
+            "aggregate_inclusive_purchase": "$1,244",
+            "investment_amount": "1,234",
+            "investor_address": "Koltsova blvd 14d",
+            "investor_optional_address": "",
+            "investor_code": "03194",
+            "investor_city": "03330 Naves",
+            "investor_state": "",
+            "investor_email": "vladimir.chagin@gmail.com",
+            "investor_number_purchased": 24.38253309622604
+          },
+          "template": "invest/subscription_agreement_revenue_share.pdf"
+        }
+      ];
+
+      $('#amount').val('$1,234').keyup().change();
+      $('#signature_full_name_input').val('vc');
+      inst.View._updateTotalAmount();
+
+      inst.View.saveEsign(response);
+
+      expect(api.makeRequest.called).to.equal(true);
+      expect(api.makeRequest.args[0][2]).to.deep.equal(data);
+      expect(app.routers.navigate.called).to.equal(true);
+    });
   });
+
 });
