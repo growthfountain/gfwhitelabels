@@ -1,12 +1,10 @@
 const socialAuth = require('./social-auth.js');
 const coreViews = require('core/views.ts');
 const modelCore = require('core/models.ts');
+
+let user = new modelCore.AnonymousUser();
+
 debugger;
-
-let user = new modelCore.AnonymousUser(
-  app.user
-);
-
 /*
 user.baseUrl = app.config.authServer + '/info';
 app.user.validate = () => { return {} };

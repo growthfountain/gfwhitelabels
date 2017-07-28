@@ -1,4 +1,4 @@
-import { Model } from "./models";
+import { Model, ValidationError } from "src/core/models.ts";
 import * as $ from "jquery";
 
 
@@ -144,26 +144,12 @@ class FormView extends View {
     <HTMLButtonElement>e.target.setAttribute('disabled', true);
     */
 
-    let errors = this.model.validate(newData);
-
-    if (Object.keys(errors).length !== 0) {
-      for (let key in errors) {
-        // ToDo
-        // this.errorMsg(key, errors[key]);
-      };
-      // ToDo
-      // this.find('.help-block').prev().scrollTo(25);
-      if(form) {
-        form.removeAttribute('disabled');
-      }
-      (<HTMLButtonElement>e.target).removeAttribute('disabled');
-      return false;
-    } else {
-      app.showLoading();
-
-      this.model.setData(newData);
-      this.model.save().then((response:any) => {
-
+      /*
+    this.model.save(newData).
+      catch((e:Error) => {
+        console.debug('terrible error happened', e);
+      }). 
+      then((response:any) => {
         // this.clearErrorMsgs();
         if(this._success(response)) {
 
@@ -178,15 +164,22 @@ class FormView extends View {
             { trigger: true, replace: false }
           );
         }
+      }).
+      catch(ValidationError, (err:Error) => {
+        console.log('error catched', err);
+        if(form) {
+          form.removeAttribute('disabled');
+        }
+        (<HTMLButtonElement>e.target).removeAttribute('disabled');
+        return false;
       });
-    }
+         */
     /* 
      * move to the setData method
     // api.deleteEmptyNested.call(this, this.fields, newData);
     // api.fixDateFields.call(this, this.fields, newData);
     // api.fixFieldTypes.call(this, this.fields, newData);
     */
-
   }
 
   getSuccessUrl(data:any):string {

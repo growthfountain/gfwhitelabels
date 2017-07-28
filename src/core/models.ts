@@ -1,11 +1,12 @@
+import * as $ from 'jquery';
 import api from 'src/core/api.ts';
 
 declare var app:any;
 
 interface IData { 
-  id: number;
   [propName: string]: any;
 }
+
 
 interface IModel { 
   baseUrl:string;
@@ -15,16 +16,22 @@ interface IModel {
   [propName: string]: any;
 }
 
+
+export class ValidationError extends Error {
+  name:string = 'validation model error'
+}
+
 export class Model {
 
   protected updatedKeys:string[] = [];
+  protected errors:any = {};
 
   baseUrl:string = null;
   data:IData;
   fields:IData;
   method:string = "POST";
 
-  constructor(data:IData={id:null}, fields:IData={id:null}) {
+  constructor(data:IData={}, fields:IData={}) {
     this.data = data;
     this.fields = fields;
 
@@ -47,6 +54,10 @@ export class Model {
     }
   }
 
+  public getErrors():any {
+    return this.errors;
+  }
+
   public setData(data:any):void {
     for (let key in data) {
       if (this.data[key] !== data[key]) {
@@ -60,16 +71,54 @@ export class Model {
     if (data === null) {
       data = this.data;
     }
-    return {};
+    return true;
   }
 
-  public save():any {
+  public diff(newData:any):any {
+    // Use deep diff for update only new data
+    return newData;
+  }
+
+  public save(newData:any):Promise<any> {
+    let status = this.validate(newData)
+
+    if (status === false) {
+      throw new ValidationError(this.getErrors());
+    }
+
+    let cleanedData = this.diff(newData);
+
+    return $.ajax({
+      url: this.getURL(),
+      type: this.method,
+      data: JSON.stringify(cleanedData),
+      dataType: 'json',
+      contentType: "application/json; charset=utf-8",
+      beforeSend: function (xhr:any) {
+        let token = localStorage.getItem('token');
+        if (token !== null && token !== '') {
+          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+      }
+    });
     /*
-    return api.makeRequest(
-        this.getURL(),
-        this.method,
-        this.data
-    );
+    
+    _promise.always((xhr:any, _status:string) => {
+      if (_status === 'success') {
+        this.setData(cleanedData);
+        return;
+      } else {
+        debugger;
+        return;
+        if (xhr.hasOwnProperty('responseJSON')) {
+          this.errors = xhr.responseJSON;
+        } else {
+          throw 'No json response found'
+        }
+      }
+    });
+
+    return _promise;
      */
   }
 
@@ -119,14 +168,6 @@ export class Model {
     }
 
     api.makeRequest(this.getURL(), this.method, patchData);
-  }
-
-  validate(data=null) {
-    if(data === null) {
-      data = this.data;
-    } else {
-      app.validate.validate()
-    }
   }
   */
 

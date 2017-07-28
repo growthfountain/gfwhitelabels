@@ -9,7 +9,7 @@ var app = {
 
 class API {
   constructor() {}
-  public makeRequest(url:string, _type:string="GET", data:any={}, options:any={}) {
+  public makeRequest(url:string, _type:string="GET", data:any={}, options:any={}):Promise<any> {
 
     if (_type != "GET" && _type != "OPTIONS") {
       data = JSON.stringify(data);
