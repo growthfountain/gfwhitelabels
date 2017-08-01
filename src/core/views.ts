@@ -136,21 +136,20 @@ class FormView extends View {
     }
 
     /* 
-     *
     // issue 348, disable form for double posting
     if(form.length > 0) {
       form[0].setAttribute('disabled', true);
     }
     <HTMLButtonElement>e.target.setAttribute('disabled', true);
     */
+    debugger;
 
-      /*
     this.model.save(newData).
-      catch((e:Error) => {
-        console.debug('terrible error happened', e);
-      }). 
       then((response:any) => {
         // this.clearErrorMsgs();
+        if(response === undefined) {
+          return;
+        }
         if(this._success(response)) {
 
           if(form) {
@@ -165,16 +164,22 @@ class FormView extends View {
           );
         }
       }).
-      catch(ValidationError, (err:Error) => {
-        console.log('error catched', err);
-        if(form) {
-          form.removeAttribute('disabled');
+      catch((err:Error) => {
+        if (err.name === 'validation_error') {
+          console.log('error catched', err);
+          if(form) {
+            form.removeAttribute('disabled');
+          }
+          (<HTMLButtonElement>e.target).removeAttribute('disabled');
+          return false;
+        } else {
+          console.log('error not catched');
+          console.debug('terrible error happened', err);
         }
-        (<HTMLButtonElement>e.target).removeAttribute('disabled');
-        return false;
       });
-         */
     /* 
+      catch(ValidationError, (err:Error) => {
+      });
      * move to the setData method
     // api.deleteEmptyNested.call(this, this.fields, newData);
     // api.fixDateFields.call(this, this.fields, newData);

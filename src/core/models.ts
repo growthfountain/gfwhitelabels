@@ -18,7 +18,13 @@ interface IModel {
 
 
 export class ValidationError extends Error {
-  name:string = 'validation model error'
+  name:string = 'validation_error'
+  jsonMsg:any = {};
+
+  constructor(msg:string, jsonMsg:any) {
+    super(msg);
+    this.jsonMsg = jsonMsg;
+  }
 }
 
 export class Model {
@@ -83,43 +89,45 @@ export class Model {
     let status = this.validate(newData)
 
     if (status === false) {
-      throw new ValidationError(this.getErrors());
+      throw new ValidationError('check this.jsonMsg', this.getErrors());
     }
 
     let cleanedData = this.diff(newData);
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json; charset=utf-8");
 
-    return $.ajax({
-      url: this.getURL(),
-      type: this.method,
-      data: JSON.stringify(cleanedData),
-      dataType: 'json',
-      contentType: "application/json; charset=utf-8",
-      beforeSend: function (xhr:any) {
-        let token = localStorage.getItem('token');
-        if (token !== null && token !== '') {
-          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-        }
-      }
+    let token = localStorage.getItem('token');
+    if (token !== null && token !== '') {
+      myHeaders.append('Authorization', 'Bearer ' + token);
+    }
+
+    var myRequest = new Request(this.getURL(), {
+      method: this.method,
+      body: JSON.stringify(cleanedData),
+      headers: myHeaders,
+      // mode: 'cors',
+      cache: 'default'
     });
-    /*
-    
-    _promise.always((xhr:any, _status:string) => {
-      if (_status === 'success') {
-        this.setData(cleanedData);
-        return;
+
+    return fetch(myRequest).then((response) => {
+      if (response.ok) {
+        // this.setData(cleanedData);
+        return response.json();
       } else {
-        debugger;
-        return;
-        if (xhr.hasOwnProperty('responseJSON')) {
-          this.errors = xhr.responseJSON;
+        let contentType = response.headers.get("content-type");
+        if(contentType && contentType.includes("application/json")) {
+          throw new ValidationError('check this.jsonMsg', {'field1': ['error1', 'error2']});
+          /*
+          response.json().then((errors) => {
+            this.errors = errors;
+            throw new ValidationError('error name');
+          });
+           */
         } else {
-          throw 'No json response found'
+          throw response.statusText;
         }
       }
     });
-
-    return _promise;
-     */
   }
 
   public getURL():string {

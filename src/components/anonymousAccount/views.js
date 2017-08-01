@@ -4,7 +4,6 @@ const modelCore = require('core/models.ts');
 
 let user = new modelCore.AnonymousUser();
 
-debugger;
 /*
 user.baseUrl = app.config.authServer + '/info';
 app.user.validate = () => { return {} };

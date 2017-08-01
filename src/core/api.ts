@@ -15,45 +15,38 @@ class API {
       data = JSON.stringify(data);
     }
 
-    let params = Object.assign({
-      url: url,
-      type: _type,
-      data: data,
-      dataType: 'json',
-      contentType: "application/json; charset=utf-8",
-      beforeSend: function (xhr:any) {
-        let token = localStorage.getItem('token');
-        if (token !== null && token !== '') {
-          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-        }
-      }
-    }, options);
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json; charset=utf-8");
 
-    const promise = $.ajax(params);
+    let token = localStorage.getItem('token');
+    if (token !== null && token !== '') {
+      myHeaders.append('Authorization', 'Bearer ' + token);
+    }
 
-    promise.always((xhr:any, _status:string) => {
+    var myRequest = new Request(url, Object.assign({
+      method: _type,
+      body: data,
+      headers: myHeaders,
+      // mode: 'cors',
+      cache: 'default'
+    }, options));
 
-      // If status is success or it is not get request
-      // do not show error
-      if (_status === 'success' || _type.toUpperCase() !== 'GET') {
+    return fetch(myRequest).then((response) => {
+
+      if (response.ok || _type.toUpperCase() !== 'GET') {
         return;
       }
 
-      // If we have location in responseJSON
-      // do not show error
-      if (xhr.hasOwnProperty('responseJSON') &&
-        xhr.responseJSON !== undefined &&
-        xhr.responseJSON.hasOwnProperty('location')) {
-        return;
+      let contentType = response.headers.get("content-type");
+      if(contentType && contentType.includes("application/json")) {
+        return response.json();
       }
 
       app.helpers.errorPage({
-        status: xhr.status,
-        statusText: xhr.statusText,
+        status: response.status,
+        statusText: response.statusText,
       });
     });
-
-    return promise;
   }
 };
 
