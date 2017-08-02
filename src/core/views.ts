@@ -1,14 +1,14 @@
 import { Model, ValidationError } from "src/core/models.ts";
 import * as $ from "jquery";
 
-
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
-var app = {
-  showLoading: function(){},
-  routers: {
-    navigate: function(a:any, b:any){},
+
+declare global {
+  interface app {
+    showLoading: any;
+    routers: Object;
   }
-};
+}
 
 declare global {
   interface JQuery {
@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-class View {
+export class View {
 
   protected model:Model = null;
   protected el:Element = null;
@@ -29,10 +29,12 @@ class View {
   protected events = {};
   protected directives:any = [];
 
-  constructor(model:Model=null, events={}, directives:any=[], selector="#content", ...args:any[]) {
+  constructor(model:Model=null, events={}, directives:any=[], template:any="", selector="#content", ...args:any[]) {
     this.el = document.querySelector(selector);
 
-    this.model = model;
+    if (model) {
+      this.model = model;
+    }
 
     // all additional parameters will be holder in view class
     for(let key in args) {
@@ -43,6 +45,10 @@ class View {
     let oldDirectives = Object.assign(this.directives, directives);
     this.events = Object.assign(this.events, events);
     this.directives = [];
+
+    if (template) {
+      this.template = template;
+    }
 
     for(let key in oldDirectives) {
       this.directives.push(new oldDirectives[key](this.el));
@@ -113,13 +119,9 @@ class View {
   }
 }
 
-class FormView extends View {
+export class FormView extends View {
 
   constructor(model:Model=null, events:any={}, directives:any=[], selector:string="#content", ...args:any[]) {
-
-    if (model === null) {
-      throw 'Please provide model for FormView';
-    }
 
     events['submit form'] = 'submit';
     super(model, events, directives, selector, ...args);
@@ -166,7 +168,7 @@ class FormView extends View {
       }).
       catch((err:Error) => {
         if (err.name === 'validation_error') {
-          console.log('error catched', err);
+          console.log('error catched', (<ValidationError>err).jsonMsg);
           if(form) {
             form.removeAttribute('disabled');
           }
@@ -276,8 +278,3 @@ class FormView extends View {
      */
   }
 }
-
-export default {
-  View: View,
-  FormView: FormView
-};

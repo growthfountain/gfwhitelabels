@@ -18,8 +18,8 @@ interface IModel {
 
 
 export class ValidationError extends Error {
-  name:string = 'validation_error'
-  jsonMsg:any = {};
+  public name:string = 'validation_error'
+  public jsonMsg:any = {};
 
   constructor(msg:string, jsonMsg:any) {
     super(msg);
@@ -208,4 +208,52 @@ export class AnonymousUser extends Model {
       required: true,
     },
   };
+
+  emptyLocalStorage() {
+    localStorage.clear();
+    // localStorage.removeItem('user');
+    // localStorage.removeItem('token');
+    app.cookies.expire('token');
+    this.data = {token: null, id: ''};
+  }
+
+  updateLocalStorage() {
+    localStorage.setItem('token', this.data.token);
+    localStorage.setItem('user', JSON.stringify(this.data));
+  }
+
+  setData(data) {
+    if (!data.token) {
+      return app.dialogs.error('no token or additional info provided');
+    }
+    this.data = data;
+    this.updateLocalStorage();
+
+    // ToDo
+    // Fix year
+    app.cookies.set('token', data.token, {
+      domain: '.' + app.config.domainUrl,
+      // expires: YEAR,
+      path: '/',
+    });
+  }
+
+  getInfoData() {
+    $.when(api.makeRequest(app.config.authServer + '/info',  'GET')).done((responseData) => {
+      if(responseData) {
+        // we need to rerender menu
+        this.data = responseData;
+      } else {
+        this.data = JSON.parse(JSON.stringify(responseData));
+      }
+
+      this.updateLocalStorage();
+
+    }).fail(() => {
+      this.emptyLocalStorage();
+      setTimeout(function() {
+        window.location.href = '/account/login?next=' + document.location.pathname;
+      }, 100);
+    });
+  }
 };

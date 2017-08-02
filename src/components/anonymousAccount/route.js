@@ -1,5 +1,6 @@
 // const socialAuth = require('./social-auth.js');
 
+
 module.exports = {
   routes: {
     'account/login': 'login',
@@ -26,8 +27,8 @@ module.exports = {
           return false;
         }
 
-        const View = require('./views.js');
-        let loginView = View.login;
+        const View = require('components/anonymousAccount/views.ts');
+        let loginView = new View.login();
         loginView.render();
         app.hideLoading();
       }, 'anonymous_account_chunk');
