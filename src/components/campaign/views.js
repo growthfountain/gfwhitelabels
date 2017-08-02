@@ -7,19 +7,6 @@ const validation = require('components/validation/validation.js');
 
 const CalculatorView = require('./revenueShareCalculator.js');
 
-const preventScrollHandler = (e) => {
-  e.preventDefault();
-  return false;
-};
-
-const preventBodyScrolling = (preventScroll) => {
-  if (preventScroll === true) {
-    document.body.addEventListener("touchmove", preventScrollHandler);
-  } else {
-    document.body.removeEventListener("touchmove", preventScrollHandler);
-  }
-};
-
 module.exports = {
   list: Backbone.View.extend({
     el: '#content',
@@ -246,9 +233,6 @@ module.exports = {
               title : {
                 type : 'inside'
               },
-              // overlay: {
-              //   locked: false
-              // }
             },
             beforeShow(){
               const $html = $('html');
@@ -257,28 +241,13 @@ module.exports = {
                   $html.addClass(cssClass);
                 }
               });
-              preventBodyScrolling(true);
-              // $('html').css('overflowX', 'visible');
-              // $('body').css('overflowY', 'hidden');
+              app.preventBodyScrolling(true);
             },
             afterClose(){
               $('html').removeClass('fancybox-margin fancybox-lock');
-              // $('html').css('overflowX', 'hidden');
-              // $('body').css('overflowY', 'visible');
-              preventBodyScrolling(false);
+              app.preventBodyScrolling(false);
             }
           });
-
-          // $fancyBox.fancybox({
-          //   openEffect  : 'elastic',
-          //   closeEffect : 'elastic',
-          //
-          //   helpers : {
-          //     title : {
-          //       type : 'inside'
-          //     }
-          //   }
-          // });
           resolve();
         }, 'fancybox_chunk');
       });
@@ -345,7 +314,7 @@ module.exports = {
     },
 
     render() {
-      if (this.model.campaign.expired) {
+      if (this.model.isClosed() || this.model.campaign.expired) {
         const template = require('./templates/detailNotAvailable.pug');
         this.$el.html(template());
         app.hideLoading();
@@ -675,7 +644,7 @@ module.exports = {
     },
 
     render() {
-      if (this.model.campaign.expired) {
+      if (this.model.isClosed() || this.model.campaign.expired) {
         const template = require('./templates/detailNotAvailable.pug');
         this.$el.html(template());
         return this;
@@ -1245,9 +1214,11 @@ module.exports = {
   investmentThankYou: Backbone.View.extend({
     template: require('./templates/thankYou.pug'),
     el: '#content',
-    initialize(options) {
+    initialize() {
       if (this.model.company.ga_id)
         app.analytics.emitCompanyCustomEvent(this.model.company.ga_id);
+
+      $('.popover').popover('hide');
     },
 
     render() {
