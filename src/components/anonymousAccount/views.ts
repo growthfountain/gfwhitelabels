@@ -1,30 +1,18 @@
 const socialAuth = require('./social-auth.js');
 
 import { View, FormView } from "src/core/views.ts";  
-import { AnonymousUser, ValidationError } from "src/core/models.ts";  
+import { ValidationError } from "src/core/models.ts";  
+import { AnonymousUser, SIGNUP_FIELDS, LOGIN_FIELDS } from "src/components/anonymousAccount/models.ts";  
 
-/*
-let user = new modelCore.AnonymousUser();
-user.baseUrl = app.config.authServer + '/info';
-app.user.validate = () => { return {} };
-app.user.save = () => { 
-  return api.makeRequest(                                                        
-    this.getURL(),                                                             
-    this.method,                                                               
-    this.data                                                                  
-  ); 
-}
-*/
-
-
+// Fix for require pug files
 declare function require(path: string): any;
 
-export class loginView extends FormView {
+export class Login extends FormView {
   public template = require('./templates/login.pug');
   public model = new AnonymousUser();
+  public fields = LOGIN_FIELDS;
 
   _success(data:any) {
-    debugger;
     this.model.setData(data);
     return true;
   }
@@ -38,40 +26,22 @@ export class loginView extends FormView {
   }
 };
 
-  /*
-let loginView = new coreViews.default.FormView(user);
-loginView._success = (data) => { app.user.setData(data); };
-loginView.template = require('./templates/login.pug');
-   */
 
+export class Signup extends FormView {
+  public template = require('./templates/signup.pug');
+  public model = new AnonymousUser();
+  public fields = SIGNUP_FIELDS;
+  public events = {
+    'click .btn-social-network': 'loginWithSocial',
+  };
 
-const Views = {
-  login: loginView,
-  /*
-    urlRoot: app.config.authServer + '/rest-auth/login',
-    template: require('./templates/login.pug'),
-    events: {
-      'submit .login-form': api.submitAction,
-    },
+	_success(data:any) {
+		this.model.setData(data).then(() => {
+			app.analytics.emitEvent(app.analytics.events.RegistrationCompleted, app.user.stats);
+		});
+	}
 
-    initialize() {
-      this.fields = LOGIN_FIELDS;
-    },
-
-    render() {
-      $('body').scrollTo();
-
-      this.$el.html(
-        this.template()
-      );
-      return this;
-    },
-
-    _success(data) {
-      app.user.setData(data);
-    },
-  }),
-  */
+	loginWithSocial(e:Event) {
+    //socialAuth.loginWithSocialNetwork.call(this, e);
+	}
 };
-
-module.exports = Views;

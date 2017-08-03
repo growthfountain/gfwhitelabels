@@ -29,12 +29,22 @@ export class View {
   protected events = {};
   protected directives:any = [];
 
-  constructor(model:Model=null, events={}, directives:any=[], template:any="", selector="#content", ...args:any[]) {
+  constructor(model:Model=null, events={}, directives:any=[], template:any="",
+    selector="#content", fields:any=null, ...args:any[]) {
     this.el = document.querySelector(selector);
 
     if (model) {
       this.model = model;
     }
+
+    if (fields === null && this.model && this.model.fields) {
+      this.fields = Object.assign(this.fields, this.model.fields);
+    } else if(fields) {
+      this.fields = Object.assign(this.fields, fields);
+    }
+
+    // ToDo
+    // create each field as View class
 
     // all additional parameters will be holder in view class
     for(let key in args) {

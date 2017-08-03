@@ -28,7 +28,7 @@ module.exports = {
         }
 
         const View = require('components/anonymousAccount/views.ts');
-        let loginView = new View.login();
+        let loginView = new View.Login();
         loginView.render();
         app.hideLoading();
       }, 'anonymous_account_chunk');
@@ -38,11 +38,8 @@ module.exports = {
       require.ensure([], (require) => {
         $('body').scrollTo();
 
-        const View = require('./views.js');
-        const signView = new View.signup({
-          el: '#content',
-          model: {},
-        });
+        const View = require('./views.ts');
+        const signView = new View.Signup();
         signView.render();
         app.hideLoading();
       }, 'anonymous_account_chunk');
