@@ -7,7 +7,6 @@ const validation = require('components/validation/validation.js');
 
 const CalculatorView = require('./revenueShareCalculator.js');
 
-
 module.exports = {
   list: Backbone.View.extend({
     el: '#content',
@@ -16,8 +15,6 @@ module.exports = {
       'change select.orderby': 'orderby',
     },
     initialize(options) {
-      options.collection.data = options.collection.data.map(companyData => new app.models.Company(companyData));
-      options.collection.data = options.collection.data.filter(companyData => !companyData.campaign.expired);
       this.collection = options.collection;
     },
 
@@ -26,7 +23,7 @@ module.exports = {
 
       require('bootstrap-select/sass/bootstrap-select.scss');
 
-      let selectPicker = require('bootstrap-select');
+      require('bootstrap-select');
       this.$el.html('');
       this.$el.append(
         this.template({
@@ -53,7 +50,7 @@ module.exports = {
       'show.bs.collapse .panel': 'onCollapse',
       'click .see-all-risks': 'seeAllRisks',
       'click .see-all-faq': 'seeAllFaq',
-      'click .show-more-members': 'readMore',
+      'click': 'readMore',
       // 'click .see-all-article-press': 'seeAllArticlePress',
       'click .more-less': 'showMore',
       'hidden.bs.collapse #hidden-article-press' :'onArticlePressCollapse',
@@ -88,7 +85,7 @@ module.exports = {
       };
 
       if (this.model.ga_id) {
-        app.emitCompanyAnalyticsEvent(this.model.ga_id);
+        app.analytics.emitCompanyCustomEvent(this.model.ga_id);
       }
     },
 
@@ -232,10 +229,23 @@ module.exports = {
             openEffect  : 'elastic',
             closeEffect : 'elastic',
 
-            helpers : {
+            helpers: {
               title : {
                 type : 'inside'
-              }
+              },
+            },
+            beforeShow(){
+              const $html = $('html');
+              ['fancybox-margin', 'fancybox-lock'].forEach((cssClass) => {
+                if (!$html.hasClass(cssClass)) {
+                  $html.addClass(cssClass);
+                }
+              });
+              app.preventBodyScrolling(true);
+            },
+            afterClose(){
+              $('html').removeClass('fancybox-margin fancybox-lock');
+              app.preventBodyScrolling(false);
             }
           });
           resolve();
@@ -304,7 +314,7 @@ module.exports = {
     },
 
     render() {
-      if (this.model.campaign.expired) {
+      if (this.model.isClosed() || this.model.campaign.expired) {
         const template = require('./templates/detailNotAvailable.pug');
         this.$el.html(template());
         app.hideLoading();
@@ -338,7 +348,7 @@ module.exports = {
               "-webkit-transform" : "translate3d(0px, " + st /2 + "%, .01px)",
               "-moz-transform" : "translate3d(0px, " + st /2 + "%, .01px)",
               "-ms-transform" : "translate3d(0px, " + st /2 + "%, .01px)"
-              
+
             });
           });
       this.$el.find('.perks .col-xl-4 p').equalHeights();
@@ -367,10 +377,14 @@ module.exports = {
     },
 
     readMore(e) {
-      e.preventDefault();
-      $(e.target).parent().addClass('show-more-detail');
+      const $target = $(e.target).closest('.show-more-members');
+      if ($target.length) {
+        e.preventDefault();
+        $(e.target).parent().addClass('show-more-detail');
+      } else {
+        this.$('.show-more-members').parent().removeClass('show-more-detail');
+      }
     },
-
   }),
 
   investment: Backbone.View.extend({
@@ -533,37 +547,38 @@ module.exports = {
           },
           choices: COUNTRIES
         },
+        messageRequired: 'Not a valid choice',
       });
 
       this.fields.personal_information_data.schema.phone = _.extend(this.fields.personal_information_data.schema.phone, {
-        required: false,
-        fn: function(name, value, attr, data, schema) {
-          let country = this.getData(data, 'personal_information_data.country');
-          if (country == 'US')
-            return;
-
-          return this.required(name, true, attr, data);
-        },
+        // required: false,
+        // fn: function(name, value, attr, data, schema) {
+        //   let country = this.getData(data, 'personal_information_data.country');
+        //   if (country == 'US')
+        //     return;
+        //
+        //   return this.required(name, true, attr, data);
+        // },
       });
 
       this.fields.personal_information_data.schema.city = _.extend(this.fields.personal_information_data.schema.city, {
-        fn: function(name, value, attr, data, schema) {
-          let country = this.getData(data, 'personal_information_data.country');
-          if (country == 'US')
-            return;
-          return this.required(name, true, attr, data);
-        },
-        required: false,
+        // fn: function(name, value, attr, data, schema) {
+        //   let country = this.getData(data, 'personal_information_data.country');
+        //   if (country == 'US')
+        //     return;
+        //   return this.required(name, true, attr, data);
+        // },
+        // required: false,
       });
 
       this.fields.personal_information_data.schema.state = _.extend(this.fields.personal_information_data.schema.state, {
         required: false,
-        fn: function(name, value, attr, data, schema) {
-          let country = this.getData(data, 'personal_information_data.country');
-          if (country == 'US')
-            return;
-          return this.required(name, true, attr, data);
-        },
+        // fn: function(name, value, attr, data, schema) {
+        //   let country = this.getData(data, 'personal_information_data.country');
+        //   if (country == 'US')
+        //     return;
+        //   return this.required(name, true, attr, data);
+        // },
       });
 
       // this.user.ssn_re = this.user.ssn;
@@ -578,7 +593,7 @@ module.exports = {
           city: 'City',
         },
         payment_information_data: {
-          name_on_bank_account: 'Name on Bank Account',
+          name_on_bank_account: 'Name As It Appears on Bank Account',
           account_number: 'Account Number',
           account_number_re: 'Re-enter Account Number',
           routing_number: 'Routing Number',
@@ -629,11 +644,11 @@ module.exports = {
       this.initMaxAllowedAmount();
 
       if (this.model.ga_id)
-        app.emitCompanyAnalyticsEvent(this.model.ga_id);
+        app.analytics.emitCompanyCustomEvent(this.model.ga_id);
     },
 
     render() {
-      if (this.model.campaign.expired) {
+      if (this.model.isClosed() || this.model.campaign.expired) {
         const template = require('./templates/detailNotAvailable.pug');
         this.$el.html(template());
         return this;
@@ -1194,8 +1209,7 @@ module.exports = {
     _success(data) {
       const feeInfo = this.calcFeeWithCredit();
       this.user.credit = feeInfo.remainingCredit;
-
-      app.emitFacebookPixelEvent('MakeInvestment');
+      app.analytics.emitEvent(app.analytics.events.InvestmentMade, app.user.stats);
       this.saveEsign(data);
     },
 
@@ -1204,9 +1218,11 @@ module.exports = {
   investmentThankYou: Backbone.View.extend({
     template: require('./templates/thankYou.pug'),
     el: '#content',
-    initialize(options) {
+    initialize() {
       if (this.model.company.ga_id)
-        app.emitCompanyAnalyticsEvent(this.model.company.ga_id);
+        app.analytics.emitCompanyCustomEvent(this.model.company.ga_id);
+
+      $('.popover').popover('hide');
     },
 
     render() {

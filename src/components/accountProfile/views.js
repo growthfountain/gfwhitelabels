@@ -151,7 +151,7 @@ module.exports = {
         instagram: 'Your Instagram Link',
         linkedin: 'Your LinkedIn Link',
         bank_name: 'Bank Name',
-        name_on_bank_account: 'Name on Bank Account',
+        name_on_bank_account: 'Name As It Appears on Bank Account',
         ssn: 'Social Security Number (SSN) or Tax ID (ITIN/EIN)',
         ssn_re: 'Re-enter SSN',
       };
@@ -388,6 +388,7 @@ module.exports = {
         investment: require('./templates/snippets/investment.pug'),
         creditSection: require('./templates/snippets/creditSection.pug'),
         confirmCancel: require('./templates/snippets/confirm-cancel.pug'),
+        noInvestments: require('./templates/snippets/no-investments.pug'),
       };
 
       //this is auth cookie for downloadable files
@@ -455,6 +456,8 @@ module.exports = {
     },
 
     onCancel(investment) {
+      app.analytics.emitEvent(app.analytics.events.InvestmentCancelled, app.user.stats);
+
       _.each(this.model.data, (i) => {
         if (i.campaign_id != investment.campaign_id)
           return;
@@ -545,10 +548,7 @@ module.exports = {
           let hasActiveInvestments = _.some(this.model.data, i => i.active);
           if (!hasActiveInvestments)
             $('#active .investor_table')
-              .append(
-                '<div role="alert" class="alert alert-warning">' +
-                '<strong>You have no active investments</strong>' +
-                '</div>');
+              .append(this.snippets.noInvestments());
 
           let historicalInvestmentsBlock = this.$el.find('#historical .investor_table');
           let historicalInvestmentElements = historicalInvestmentsBlock.find('.one_table');
@@ -683,6 +683,10 @@ module.exports = {
         })
       );
 
+      setTimeout(() => {
+        $('.count-num').animateCount();
+      },100);
+
       this.initComments();
 
       require.ensure(['src/js/graph/graph.js', 'src/js/graph_data.js'], () => {
@@ -715,19 +719,23 @@ module.exports = {
           readonly: this.campaign.expired,
           cssClass: 'col-xl-8 offset-xl-0',
         });
+
         comments.render();
 
-        let commentsCount = 0;
-
         function countComments(comments) {
-          commentsCount += comments.length;
+          let count = comments.length || 0;
           _.each(comments, (c) => {
-            countComments(c.children);
+            count += countComments(c.children);
           });
+
+          return count;
         }
 
-        countComments(data[0].data);
-        $('.interactions-count').text(commentsCount);
+        const commentsCount = countComments(data[0].data);
+
+        $('.interactions-count').data('value', commentsCount).text(commentsCount);
+        $('.interactions-count').animateCount();
+
       });
     },
   }),

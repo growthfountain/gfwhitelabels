@@ -96,6 +96,7 @@ module.exports = {
       'click .link-2': 'openPdf',
       'keyup #full_name': 'changeSign',
       'click #pay-btn': 'stripeSubmit',
+      'click .submit_formc': submitFormc,
     }, app.helpers.menu.events, app.helpers.yesNo.events, /*app.helpers.confirmOnLeave.events*/),
 
     preinitialize() {
@@ -350,15 +351,12 @@ module.exports = {
       let $submitBtn = $form.find('#pay-btn');
       $submitBtn.prop('disabled', true);
 
-      let data = $form.serializeJSON({ checkboxUncheckedValue: 'false', useIntKeysAsArrayIndex: true });
-
+      let data = $form.serializeJSON();
       if (data.certify == 0) {
         delete data.certify;
       }
 
-      api.submitAction.call(this, e, data);
-
-      return false;
+      return api.submitAction.call(this, e, data);
     },
 
     changeSign() {
@@ -664,6 +662,13 @@ module.exports = {
           delete data.role;
         }
       }
+
+      //process current date in experiences
+      // TODO: process current date
+      // data.experiences.forEach((exp) => {
+      //   if (!exp.end_date_of_service__month && !exp.end_date_of_service__year)
+      //     delete this.fields.experiences.schema.end_date_of_service;
+      // });
       api.submitAction.call(this, e, data);
     },
 
@@ -934,11 +939,6 @@ module.exports = {
       this.$('.max-total-use,.min-total-use').popover({
         html: true,
         template: '<div class="popover  divPopover" style="width:160px"  role="tooltip"><span class="popover-arrow"></span> <h3 class="popover-title"></h3> <span class="icon-popover"><i class="fa fa-info-circle" aria-hidden="true"></i></span> <span class="popover-content"> XXX </span></div>'
-      });
-
-      this.$('.min-expense,.max-expense,.min-use,.max-use').each(function (idx, elem) {
-        let $this = $(this);
-        $this.val(app.helpers.format.formatNumber($this.val()));
       });
 
       this.calculate(null, false);
@@ -1724,6 +1724,95 @@ module.exports = {
     },
   }, app.helpers.menu.methods, app.helpers.section.methods, riskFactors.methods, app.helpers.confirmOnLeave.methods)),
 
+  xeroIntegration: Backbone.View.extend({
+    urlRoot: app.config.formcServer + '/:id/financial-condition/xero',
+
+    events: _.extend({
+      'click .xeroConnect': 'xeroConnect',
+      'click .xeroGrabData': 'xeroGrabData',
+    }),
+
+    render() {
+      let template = require('./templates/xeroIntegration.pug');
+      this.fields = {
+        code: {
+          type: 'number',
+          required: true
+        },
+        documents: {
+          type: 'json',
+          required: true,
+          fn: function checkNotEmpty(name, value, attr, data, computed) {
+            if(value.length == 0) {
+              throw 'Please select at least on document';
+            }
+          },
+        }
+
+      }
+
+      this.$el.html(
+        template({
+          view: this,
+          fields: this.fields
+        })
+      );
+      return this;
+    },
+
+    xeroConnect(e) {
+      api.makeRequest(this.urlRoot.replace(':id', this.model.id)).
+        then((data) => {
+          this.el.querySelector('#code').dataset.token = data.token;
+          this.el.querySelector('#code').dataset.secret = data.token_secret;
+          this.el.querySelector('#url').href = data.url;
+          this.$el.find('#xeroModal').modal('show');
+        });
+    },
+
+    xeroGrabData(e) {
+
+      e.preventDefault();
+      this.$('.help-block').remove();
+
+      let code = e.currentTarget.parentElement.parentElement.querySelector('#code');
+      let data = {};
+      data.token = code.dataset.token;
+      data.token_secret = code.dataset.secret;
+      data.id = this.model.id;
+      data.documents = [];
+      data.code = code.value;
+      this.el.querySelectorAll('[name="documents[]"]').forEach((el) => { 
+        if(el.checked == true) {
+          data.documents.push(el.value)
+        }
+      })
+
+      if(!app.validation.validate(this.fields, data, this)) {
+        _(app.validation.errors).each((errors, key) => {
+          app.validation.invalidMsg(this, key, errors);
+        });
+        this.$('.help-block').prev().scrollTo(5);
+        e.target.removeAttribute('disabled');
+        return false;
+      } else {
+        app.showLoading();
+        api.makeRequest(
+            app.config.formcServer + '/' + this.model.id + '/financial-condition/xero',
+            'PUT',
+            data
+        ).then((data) => {
+          window.location.reload();
+        }).fail((xhr, message) => {
+          app.hideLoading();
+          this.$el.find('#xeroModal .modal-body').html('<h3>' + xhr.responseJSON.message + '</h3>');
+        });
+      }
+
+    },
+
+  }),
+
   financialCondition: Backbone.View.extend(_.extend({
     urlRoot: app.config.formcServer + '/:id/financial-condition',
 
@@ -1782,9 +1871,13 @@ module.exports = {
     render() {
       let template = require('./templates/financialCondition.pug');
 
+      const View = require('components/formc/views.js');
+
+
       this.$el.html(
         template({
           view: this,
+          xeroIntegration: xeroIntegration,
           fields: this.fields,
           values: this.model,
           campaignId: this.campaign.id,
@@ -1793,8 +1886,16 @@ module.exports = {
       );
       app.helpers.disableEnter.disableEnter.call(this);
       this.campaign.updateMenu(this.campaign.calcProgress());
+
+      let xeroIntegration =  new View.xeroIntegration({
+        model: this.model,
+        el: this.el.querySelector('#xeroBlock')
+      });
+      xeroIntegration.render();
+      xeroIntegration.delegateEvents();
       return this;
     },
+
   }, app.helpers.menu.methods, app.helpers.yesNo.methods, app.helpers.section.methods, app.helpers.confirmOnLeave.methods)),
 
   outstandingSecurity: Backbone.View.extend(_.extend({
@@ -1802,7 +1903,7 @@ module.exports = {
     events: _.extend({
       'submit #security_model_form': 'addOutstanding',
       'change #security_type': 'outstandingSecurityUpdate',
-      'click #submitForm': api.submitAction,
+      'click #submitForm': 'submit',
       'click .submit_formc': submitFormc,
       'click .newOustanding': 'newOustanding',
       'click .editOutstanding': 'editOutstanding',
@@ -2044,7 +2145,7 @@ module.exports = {
 
     _success(data, newData) {
       this.model.updateMenu(this.model.calcProgress());
-      return 1;
+      return true;
     },
 
     getSuccessUrl() {
@@ -2071,6 +2172,22 @@ module.exports = {
       app.helpers.disableEnter.disableEnter.call(this);
       this.campaign.updateMenu(this.campaign.calcProgress());
       return this;
+    },
+
+    submit(e) {
+      e.preventDefault();
+
+      let data = $(e.currentTarget).closest('form').serializeJSON();
+
+      if (data.business_loans_or_debt_choice === false) {
+        data.business_loans_or_debt = [];
+      }
+
+      if (data.exempt_offering_choice === false) {
+        data.exempt_offering = [];
+      }
+
+      return api.submitAction.call(this, e, data);
     },
   }, app.helpers.section.methods, app.helpers.menu.methods, app.helpers.yesNo.methods, app.helpers.confirmOnLeave.methods)),
 
@@ -2258,6 +2375,11 @@ module.exports = {
 
       } else if(name.indexOf('campaign.') !== -1) {
         fieldName = name.split('campaign.')[1];
+
+        if (fieldName = 'security_type')  {
+          val = parseInt(val);
+        }
+
         data[fieldName] = val;
         url = app.config.raiseCapitalServer + '/campaign/' + this.campaign.id;
         updateModel = this.campaign;
@@ -2371,7 +2493,7 @@ module.exports = {
       this.fields.company.state.validate.choices = require('consts/usaStatesChoices.json');
       this.fields.company.corporate_structure.validate.choices = require('consts/raisecapital/corporate_structure.json');
       this.fields.campaign.length_days.validate.choices = require('consts/raisecapital/length_days.json');
-      this.fields.campaign.security_type.validate.choices = yesNoConsts.YESNO;
+      this.fields.campaign.security_type.validate.choices = require('consts/raisecapital/security_type_options.json');
       this.fields.campaign.valuation_determination.validate.choices = require('consts/raisecapital/valuation_determination_options.json');
       this.fields.formc.outstanding_securities.schema.security_type.type = 'choice';
       this.fields.formc.outstanding_securities.schema.security_type.validate = {};

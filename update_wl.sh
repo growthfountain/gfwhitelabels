@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 git fetch -q --all
-git checkout alpha > /dev/null
-for b in alpha-dcu alpha-momentum3 alpha-rivermarkcu alpha-jdcu alpha-infinityfcu alpha-tvfcu
+
+if git branch --all | grep --quiet "remotes/vladyslav2/alpha"; then
+    echo "============ MERGE WITH VLADYSLAV/alpha ============"
+    git merge --no-ff vladyslav2/alpha > /dev/null
+fi
+
+git checkout origin/alpha > /dev/null
+if git branch --all | grep --quiet "remotes/vladyslav2/$b"; then
+    echo "============ MERGE WITH VLADYSLAV ALPHA ============"
+    git merge vladyslav2/alpha > /dev/null
+fi
+
+for b in $(cat branches.txt)
 do
     echo "========================= branch $b =========================="
     if git checkout $b; then
@@ -20,7 +31,7 @@ do
             git merge vladyslav2/$b > /dev/null
         fi
 
-        git merge --no-ff alpha > /dev/null
+        git merge --no-ff origin/alpha > /dev/null
         ./fix_merge.sh
 
         if git st | grep --quiet 'UU '; then
@@ -28,6 +39,7 @@ do
             git st | grep 'UU '
             break;
         else
+            git commit -p
             git push origin $b
             # Push in the main repositary will not work
             # if git branch --all | grep --quiet "remotes/vladyslav2/$b"; then
@@ -38,8 +50,8 @@ do
         echo ""
     else
         echo "$b failed to checkout. Update script stopped"
-        git status
-        git branch
+        git st;
+        exit 1;
     fi
 done
 
