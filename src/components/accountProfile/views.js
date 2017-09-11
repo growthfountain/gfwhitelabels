@@ -51,8 +51,8 @@ module.exports = {
             height: 300,
           },
           resize: {
-            width: 50,
-            height: 50,
+            width: 150,
+            height: 150,
           },
           cssClass: 'img-profile-crop',
           template: 'withpreview',

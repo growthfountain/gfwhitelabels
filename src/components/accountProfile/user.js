@@ -19,7 +19,7 @@ const fixImageData = (data) => {
   data.image_data.urls = {
     origin: originData.urls ? (originData.urls[0] || '') : '',
     main: croppedData.urls ? (croppedData.urls[0] || '') : '',
-    '50x50': croppedData.urls ? (croppedData.urls[0] || '') : '',
+    '150x150': croppedData.urls ? (croppedData.urls[0] || '') : '',
   }
 
   return data;
