@@ -45,14 +45,11 @@ let functions = {
       initLibrary().then(() => {
         console.log(`Logging in via ${network}`);
 
-        debugger;
         hello(network).login({
           scope: SCOPES[network],
         }).then((data) => {
-          debugger;
           return this.sendToken(network, data.authResponse.access_token);
         }).then((data) => {
-          debugger;
           return resolve({
             cancelled: false,
             data,
@@ -125,7 +122,6 @@ let functions = {
   },
 
   signupWithSocialNetwork(network) {
-    debugger;
     if (!functions._ensureAgreedWithRules(this))
       return Promise.resolve(false);
 
