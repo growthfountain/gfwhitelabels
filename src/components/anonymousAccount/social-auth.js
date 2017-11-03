@@ -125,6 +125,7 @@ let functions = {
   },
 
   signupWithSocialNetwork(network) {
+    debugger;
     if (!functions._ensureAgreedWithRules(this))
       return Promise.resolve(false);
 
