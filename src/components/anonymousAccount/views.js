@@ -45,9 +45,18 @@ const SIGNUP_FIELDS = {
   email: LOGIN_FIELDS.email,
   domain: LOGIN_FIELDS.domain,
   password1: Object.assign({}, LOGIN_FIELDS.password, { label: 'Password' }),
+  referrer: {
+    type: 'string',
+    required: false,
+    fn(name, value, attr, data, computed) {
+      data.referrer = document.referrer;
+    },
+  },
+
   //we left only one password field
   // password2: Object.assign({}, LOGIN_FIELDS.password, { label: 'Re-enter Password'}),
 };
+
 
 const popupAuthHelper = {
   events: {
@@ -138,6 +147,10 @@ const onRegistrationComplete = (data) => {
     path: document.referrer,
     device: navigator.userAgent
   });
+
+  api.makeRequest(app.config.emailServer + '/subscribe', 'PUT',
+      {'type': 'signup'}
+  );
 };
 
 function signUpWithSocialNetwork(e) {
