@@ -128,7 +128,7 @@ class User {
         setTimeout(function() {
           //TODO: replace this with app.routers.navigate
           window.location = next;
-        }, 200);
+        }, 900);
         resolve();
       }).fail(() => {
         this.emptyLocalStorage();
