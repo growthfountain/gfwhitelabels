@@ -7,8 +7,8 @@
   var roles = app.helpers.role.extractRolesByPriority(roleBitmap);
   var passedTime = app.helpers.date.fromNow(comment.created_date);
   var avatar = require('images/default/Default_photo.png');
-  if(comment.user.image_data.urls && comment.user.image_data.urls['50x50']) {
-    avatar = app.sites[comment.user.image_data.site_id] + comment.user.image_data.urls['50x50'];
+  if(comment.user.image_data.urls && comment.user.image_data.urls['main']) {
+    avatar = app.sites[comment.user.image_data.site_id] + comment.user.image_data.urls['main'];
   }
 
 div(id=('comment' + comment.uid) data-id=comment.uid data-level=level).single-comment.col-xl-12
