@@ -268,7 +268,7 @@ module.exports = {
               app.config.emailServer + '/subscribe',
               'PUT',
               {'type': 'calc'}
-              );
+          );
         }, 1000);
       }
 
