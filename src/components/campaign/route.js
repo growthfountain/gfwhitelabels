@@ -76,6 +76,7 @@ module.exports = {
           api.makeCacheRequest(app.config.raiseCapitalServer + '/company', 'OPTIONS'),
           api.makeCacheRequest(app.config.raiseCapitalServer + '/' + name)
         ).done((companyFields, companyData) => {
+          $('body').scrollTo();
           const model = new app.models.Company(companyData[0], companyFields[0]);
           let metaDescription = model.tagline + '. ';
           const dotIdx = model.description ? model.description.indexOf('.') : 0;
