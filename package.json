@@ -54,7 +54,7 @@
     "babel-polyfill": "^6.23.0",
     "backbone": "git+https://github.com/jashkenas/backbone.git",
     "bootstrap": "4.0.0-alpha.4",
-    "bootstrap-select": "^1.10.0",
+    "bootstrap-select": "1.10.0",
     "bootstrap-slider": "^9.7.2",
     "classlist-polyfill": "^1.0.3",
     "cookies-js": "^1.2.3",
